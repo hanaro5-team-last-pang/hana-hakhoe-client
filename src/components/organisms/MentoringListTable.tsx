@@ -72,6 +72,7 @@ export default function MentoringListTable(props: Props) {
         rowData={mentorings}
         columnDefs={colDefs}
         onRowClicked={handleRowClick}
+        className="font-fontLight"
       />
     </div>
   );
