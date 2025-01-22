@@ -91,9 +91,5 @@ export default function HeaderTab() {
     },
   ];
 
-  return (
-    <div>
-      <Tab tabList={tabList} />
-    </div>
-  );
+  return <Tab tabList={tabList} />;
 }

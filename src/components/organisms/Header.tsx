@@ -34,7 +34,7 @@ export default function Header({ children }: Props) {
               />
             </Link>
           </div>
-          <div>{children}</div>
+          <div className="h-full">{children}</div>
           <div>
             {loginStatus ? (
               <div className="flex gap-2">

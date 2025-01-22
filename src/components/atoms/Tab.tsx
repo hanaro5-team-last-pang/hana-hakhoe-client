@@ -27,14 +27,14 @@ export default function Tab({
   tabPanelClassName,
 }: TabProps) {
   return (
-    <TabGroup>
-      <TabList>
-        <div className="flex items-center">
+    <TabGroup className="h-full">
+      <TabList className="h-full">
+        <div className="flex items-center h-full">
           {tabList.map((item, index) => {
             return (
               <HeadlessTab
                 key={index}
-                className={clsx('py-5 font-semibold', item.tabListClassName)}
+                className={clsx('h-full font-semibold', item.tabListClassName)}
                 onClick={item.tabOnClickEvent}
               >
                 {item.tabTitle}
