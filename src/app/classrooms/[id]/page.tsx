@@ -21,35 +21,38 @@ export default async function Page(props: { params: Params }) {
   const classroomTitle = '양지은의 주식 투자 시작';
 
   return (
-    <>
-      <div className="hidden lg:block">
-        <div className="flex justify-center border-r-4 border-gray-300 h-full">
-          <div className="relative w-10 h-20 my-2">
-            <Image
-              src="/verticalLogo.png"
-              alt="세로 로고"
-              className="object-contain"
-              fill
-            />
+    <StompConnectionProvider>
+      <div className="h-screen p-2 overflow-hidden">
+        <div className="h-full grid grid-cols-1 lg:grid-cols-[1fr_15fr_7fr] rounded-lg border-4 border-gray-300">
+          <div className="hidden lg:block">
+            <div className="flex justify-center border-r-4 border-gray-300 h-full">
+              <div className="relative w-10 h-20 my-2">
+                <Image
+                  src="/verticalLogo.png"
+                  alt="세로 로고"
+                  className="object-contain"
+                  fill
+                />
+              </div>
+            </div>
+          </div>
+          <div className="relative grid grid-rows-[1fr_12fr] h-full border-r-4 border-gray-300 min-h-0">
+            <div className="border-b-4 border-gray-300 flex items-center">
+              <Link
+                className="p-2 rounded-lg bg-green-700 mx-3"
+                href={`/mentorings/${classroomId}`}
+              >
+                <IoChevronBackSharp className="text-white" />
+              </Link>
+              <div className="font-bold ">{classroomTitle}</div>
+            </div>
+            <VideoComponent classroomId={classroomId} />
+          </div>
+          <div className="p-4 hidden lg:block relative overflow-y-auto">
+            <ChatComponent classroomId={classroomId} />
           </div>
         </div>
       </div>
-      <div className="relative grid grid-rows-[1fr_12fr] h-full border-r-4 border-gray-300 min-h-0">
-        <div className="border-b-4 border-gray-300 flex items-center">
-          <Link
-            className="p-2 rounded-lg bg-green-700 mx-3"
-            href={`/mentorings/${classroomId}`}
-          >
-            <IoChevronBackSharp className="text-white" />
-          </Link>
-          <div className="font-bold ">{classroomTitle}</div>
-        </div>
-        <Link href={`/classrooms/${classroomId}/review`}>모달 폼 불러오기</Link>
-        <VideoComponent />
-      </div>
-      <div className="p-4 hidden lg:block relative overflow-y-auto">
-        <ChatComponent classroomId={classroomId} />
-      </div>
-    </>
+    </StompConnectionProvider>
   );
 }

@@ -18,7 +18,7 @@ export default function Dropdown({
 }: DropdownProps) {
   return (
     <Menu>
-      <MenuButton className="items-center">{menuButton}</MenuButton>
+      <MenuButton>{menuButton}</MenuButton>
       <MenuItems anchor={anchor} className={clsx(``, menuItemsClassName)}>
         {menuItems.map((item, index) => {
           return <MenuItem key={index}>{item}</MenuItem>;
