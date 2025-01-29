@@ -2,15 +2,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function useLocalVideo() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
   const [curConstraints, setConstraints] = useState<MediaStreamConstraints>({
     video: true,
     audio: true,
   });
-  const streamRef = useRef<MediaStream | null>(null);
 
   const changeStream = async () => {
-    streamRef.current =
-      await navigator.mediaDevices.getUserMedia(curConstraints);
+    const newStream = await navigator.mediaDevices.getUserMedia(curConstraints);
+    setStream(newStream); // 상태 업데이트
   };
 
   const changeDevice = useCallback((device: MediaDeviceInfo) => {
@@ -35,17 +35,23 @@ export default function useLocalVideo() {
     if (!videoRef.current) {
       throw new Error('비디오를 찾을 수 없습니다.');
     }
-    videoRef.current.muted = true;
-    videoRef.current.srcObject = streamRef.current;
+    if (stream) {
+      videoRef.current.muted = true;
+      videoRef.current.srcObject = stream;
+    }
   };
 
   useEffect(() => {
-    changeStream().then(playVideo);
+    changeStream();
   }, [curConstraints]);
+
+  useEffect(() => {
+    playVideo();
+  }, [stream]);
 
   return {
     videoRef,
-    stream: streamRef.current,
+    stream,
     constraints: curConstraints,
     setConstraints,
     changeDevice,

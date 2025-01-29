@@ -1,4 +1,4 @@
-import { SignalType } from '@/webrtc/type';
+import { IceCandidateType, SignalType } from '@/webrtc/type';
 
 /**
  * 원격 피어 연결 클래스
@@ -29,6 +29,31 @@ export default class RemotePeerConnection {
     sendFn(JSON.stringify(answerSignal));
   }
 
+  public addIceCandidateCallback(
+    sendFn: (text: string) => void,
+    localPeerId: string
+  ) {
+    if (!this._pConn) {
+      throw new Error('로컬 연결을 찾을 수 없습니다.');
+    }
+    this._pConn.addEventListener('icecandidate', (e) => {
+      if (e.candidate) {
+        const iceCandidate: IceCandidateType = {
+          peerId: localPeerId,
+          candidate: e.candidate,
+        };
+        sendFn(JSON.stringify(iceCandidate));
+      }
+    });
+  }
+
+  public async receiveIceCandidateCallback(candidate: RTCIceCandidate) {
+    if (!this._pConn) {
+      throw new Error('원격 연결을 찾을 수 없습니다.');
+    }
+    await this._pConn.addIceCandidate(candidate);
+  }
+
   public async receiveOfferCallback(
     offer: RTCSessionDescriptionInit,
     sendFn: (text: string) => void
@@ -40,20 +65,22 @@ export default class RemotePeerConnection {
     await this.sendAnswer(sendFn);
   }
 
-  public async receiveIceCandidateCallback(candidate: RTCIceCandidate) {
-    if (!this._pConn) {
-      throw new Error('원격 연결을 찾을 수 없습니다.');
-    }
-    await this._pConn.addIceCandidate(candidate);
+  public addLocalTrack(localStream: MediaStream) {
+    localStream.getTracks().forEach((track) => {
+      this._pConn?.addTrack(track, localStream);
+    });
   }
 
   public addRemoteTrack(videoElement: HTMLVideoElement) {
     if (!this._pConn) {
       throw new Error('원격 연결을 찾을 수 없습니다');
     }
+
     this._pConn.addEventListener('track', async (e) => {
-      const [remoteStream] = e.streams;
-      videoElement.srcObject = remoteStream;
+      if (!videoElement.srcObject) {
+        videoElement.srcObject = e.streams[0];
+        await videoElement.play();
+      }
     });
   }
 
