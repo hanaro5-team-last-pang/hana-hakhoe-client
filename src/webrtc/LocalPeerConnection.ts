@@ -5,12 +5,8 @@ import { IceCandidateType, SignalType } from '@/webrtc/type';
  * @author magae1
  */
 export default class LocalPeerConnection {
-  private readonly _remotePeerId: string;
+  private _remotePeerId: string | undefined;
   public _pConn: RTCPeerConnection | null = null;
-
-  constructor(remotePeerId: string) {
-    this._remotePeerId = remotePeerId;
-  }
 
   public initPeerConnection(config?: RTCConfiguration) {
     this._pConn = new RTCPeerConnection(config);
@@ -88,6 +84,10 @@ export default class LocalPeerConnection {
   public close() {
     this._pConn?.close();
     this._pConn = null;
+  }
+
+  set setRemoteId(remotePeerId: string) {
+    this._remotePeerId = remotePeerId;
   }
 
   get remotePeerId() {

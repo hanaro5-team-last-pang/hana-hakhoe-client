@@ -40,7 +40,6 @@ export default function VideoComponent({ classroomId }: Props) {
   const isConnected = useContext(StompIsConnectedContext);
   const publish = useContext(StompPublishContext);
   const subscribe = useContext(StompSubscribeContext);
-  const [otherKeyList, setOtherKeyList] = useState<string[]>([]);
   const [pcListMap] = useState<
     Map<
       string,
@@ -93,13 +92,13 @@ export default function VideoComponent({ classroomId }: Props) {
     return videoElement;
   };
 
-  const initializePeerConnection = (key: string, isMentor: boolean) => {
+  const initializePeerConnection = (key: string, isLocal: boolean) => {
     const iceServers = [{ urls: 'stun:hanahakhoe.shop:3478' }];
     const configuration: RTCConfiguration = { iceServers };
 
-    const peerConnection = isMentor
+    const peerConnection = isLocal
       ? new RemotePeerConnection(key)
-      : new LocalPeerConnection(mentorKey.current!);
+      : new LocalPeerConnection();
 
     peerConnection.initPeerConnection(configuration);
     peerConnection.addLocalTrack(stream!);
@@ -108,22 +107,7 @@ export default function VideoComponent({ classroomId }: Props) {
     return peerConnection;
   };
 
-  const handleMentor = (key: string) => {
-    if (!pcListMap.has(key)) {
-      const remotePeerConnection = initializePeerConnection(
-        key,
-        true
-      ) as RemotePeerConnection;
-      const videoElement = createVideoElement(`video-${key}`);
-
-      remotePeerConnection.addRemoteTrack(videoElement);
-      pcListMap.set(key, { local: null, remote: remotePeerConnection });
-
-      setOtherKeyList((prevList) => [...prevList, key]);
-    }
-  };
-
-  const handleMentee = async () => {
+  const handleLocalPeer = async () => {
     const localPeerConnection = initializePeerConnection(
       currentKey.current,
       false
@@ -141,11 +125,26 @@ export default function VideoComponent({ classroomId }: Props) {
     }, currentKey.current);
   };
 
+  const handleRemotePeer = async (key: string) => {
+    if (!pcListMap.has(key)) {
+      const remotePeerConnection = initializePeerConnection(
+        key,
+        true
+      ) as RemotePeerConnection;
+      const videoElement = createVideoElement(`video-${key}`);
+
+      remotePeerConnection.addRemoteTrack(videoElement);
+      pcListMap.set(key, { local: null, remote: remotePeerConnection });
+    }
+  };
+
   const subscribeEnter = useCallback(() => {
     subscribe(ENTER_SUBSCRIBE_URL(classroomId), async (message: IMessage) => {
       const key: string = JSON.parse(message.body);
-      if (role.current === 'mentor') handleMentor(key);
-      if (role.current === 'mentee') await handleMentee();
+      if (key !== currentKey.current) await handleRemotePeer(key);
+      else {
+        await handleLocalPeer();
+      }
     });
 
     subscribe(
@@ -155,7 +154,7 @@ export default function VideoComponent({ classroomId }: Props) {
         const connection = pcListMap.get(peerId);
         const remotePeerConnection = connection ? connection.remote : undefined;
 
-        if (remotePeerConnection && role.current === 'mentor') {
+        if (remotePeerConnection) {
           await remotePeerConnection.receiveOfferCallback(
             description,
             (answerText) => {
@@ -170,23 +169,24 @@ export default function VideoComponent({ classroomId }: Props) {
       const { peerId, description } = JSON.parse(JSON.parse(message.body));
       const localPeerConnection = pcListMap.get(peerId)?.local;
 
-      if (localPeerConnection && role.current === 'mentee') {
+      if (localPeerConnection) {
         await localPeerConnection.receiveAnswerCallback(description);
       }
     });
 
     subscribe(TRICKLE_SUBSCRIBE_URL(classroomId), async (message: IMessage) => {
       const { peerId, candidate } = JSON.parse(JSON.parse(message.body));
-      const connection = pcListMap.get(peerId);
+      const localPeerConnection = pcListMap.get(peerId)?.local;
+      const remotePeerConnection = pcListMap.get(peerId)?.remote;
 
-      if (connection?.remote && role.current === 'mentor') {
-        await connection.remote.receiveIceCandidateCallback(candidate);
+      if (remotePeerConnection) {
+        await remotePeerConnection.receiveIceCandidateCallback(candidate);
       }
-      if (connection?.local && role.current === 'mentee') {
-        await connection.local.receiveIceCandidateCallback(candidate);
+      if (localPeerConnection) {
+        await localPeerConnection.receiveIceCandidateCallback(candidate);
       }
     });
-  }, [role, classroomId, stream]);
+  }, [classroomId, stream]);
 
   const toggleVideo = () => {
     if (videoRef.current!.srcObject) {
