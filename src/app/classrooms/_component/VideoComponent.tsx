@@ -68,95 +68,95 @@ export default function VideoComponent({ classroomId }: Props) {
     }
   }, [isConnected, stream]);
 
+  const setupIceCandidateHandling = (
+    peerConnection: LocalPeerConnection | RemotePeerConnection,
+    key: string
+  ) => {
+    peerConnection.addIceCandidateCallback((candidate) => {
+      publish(TRICKLE_PUBLISH_URL(classroomId), candidate);
+    }, key);
+  };
+
+  const createVideoElement = (id: string) => {
+    const videoElement = document.createElement('video');
+    videoElement.id = id;
+    videoElement.setAttribute('autoPlay', 'true');
+    videoElement.setAttribute('playsInline', 'true');
+    videoElement.style.width = '100%';
+    videoElement.style.height = 'auto';
+
+    const videoContainer = document.getElementById('remote-video-container');
+    if (videoContainer) {
+      videoContainer.appendChild(videoElement);
+    }
+
+    return videoElement;
+  };
+
+  const initializePeerConnection = (key: string, isMentor: boolean) => {
+    const iceServers = [{ urls: 'stun:hanahakhoe.shop:3478' }];
+    const configuration: RTCConfiguration = { iceServers };
+
+    const peerConnection = isMentor
+      ? new RemotePeerConnection(key)
+      : new LocalPeerConnection(mentorKey.current!);
+
+    peerConnection.initPeerConnection(configuration);
+    peerConnection.addLocalTrack(stream!);
+    setupIceCandidateHandling(peerConnection, key);
+
+    return peerConnection;
+  };
+
+  const handleMentor = (key: string) => {
+    if (!pcListMap.has(key)) {
+      const remotePeerConnection = initializePeerConnection(
+        key,
+        true
+      ) as RemotePeerConnection;
+      const videoElement = createVideoElement(`video-${key}`);
+
+      remotePeerConnection.addRemoteTrack(videoElement);
+      pcListMap.set(key, { local: null, remote: remotePeerConnection });
+
+      setOtherKeyList((prevList) => [...prevList, key]);
+    }
+  };
+
+  const handleMentee = async () => {
+    const localPeerConnection = initializePeerConnection(
+      currentKey.current,
+      false
+    ) as LocalPeerConnection;
+    const mentorVideoElement = createVideoElement('mentor-video');
+
+    localPeerConnection.addRemoteTrack(mentorVideoElement);
+    pcListMap.set(currentKey.current, {
+      local: localPeerConnection,
+      remote: null,
+    });
+
+    await localPeerConnection.sendOffer((offer) => {
+      publish(SIGNALING_PUBLISH_URL(classroomId), offer);
+    }, currentKey.current);
+  };
+
   const subscribeEnter = useCallback(() => {
     subscribe(ENTER_SUBSCRIBE_URL(classroomId), async (message: IMessage) => {
       const key: string = JSON.parse(message.body);
-
-      if (role.current === 'mentor') {
-        if (!pcListMap.has(key)) {
-          const remotePeerConnection = new RemotePeerConnection(key);
-
-          const iceServers = [{ urls: 'stun:hanahakhoe.shop:3478' }];
-          const configuration: RTCConfiguration = { iceServers };
-
-          remotePeerConnection.initPeerConnection(configuration);
-          remotePeerConnection.addLocalTrack(stream!);
-          remotePeerConnection.addIceCandidateCallback((candidate) => {
-            publish(TRICKLE_PUBLISH_URL(classroomId), candidate);
-          }, currentKey.current);
-
-          const videoElement = document.createElement('video');
-          videoElement.id = `video-${key}`;
-          videoElement.style.width = '100%';
-          videoElement.style.height = 'auto';
-
-          const videoContainer = document.getElementById(
-            'remote-video-container'
-          );
-          if (videoContainer) {
-            videoContainer.appendChild(videoElement);
-          }
-
-          remotePeerConnection.addRemoteTrack(videoElement);
-
-          pcListMap.set(key, {
-            local: null,
-            remote: remotePeerConnection,
-          });
-
-          setOtherKeyList((prevList) => [...prevList, key]);
-        }
-      }
-
-      if (role.current === 'mentee') {
-        const localPeerConnection = new LocalPeerConnection(mentorKey.current!);
-
-        const iceServers = [{ urls: 'stun:hanahakhoe.shop:3478' }];
-        const configuration: RTCConfiguration = { iceServers };
-
-        localPeerConnection.initPeerConnection(configuration);
-        localPeerConnection.addLocalTrack(stream!);
-        localPeerConnection.addIceCandidateCallback((candidate) => {
-          publish(TRICKLE_PUBLISH_URL(classroomId), candidate);
-        }, currentKey.current);
-
-        pcListMap.set(currentKey.current, {
-          local: localPeerConnection,
-          remote: null,
-        });
-
-        const mentorVideoElement = document.createElement('video');
-        mentorVideoElement.id = `mentor-video`;
-        mentorVideoElement.setAttribute('autoPlay', 'true');
-        mentorVideoElement.setAttribute('playsInline', 'true');
-        mentorVideoElement.style.width = '100%';
-        mentorVideoElement.style.height = 'auto';
-
-        const videoContainer = document.getElementById(
-          'remote-video-container'
-        );
-        if (videoContainer) {
-          videoContainer.appendChild(mentorVideoElement);
-        }
-
-        localPeerConnection.addRemoteTrack(mentorVideoElement);
-
-        await localPeerConnection.sendOffer((offer) => {
-          publish(SIGNALING_PUBLISH_URL(classroomId), offer);
-        }, currentKey.current);
-      }
+      if (role.current === 'mentor') handleMentor(key);
+      if (role.current === 'mentee') await handleMentee();
     });
 
     subscribe(
       SIGNALING_SUBSCRIBE_URL(classroomId),
       async (message: IMessage) => {
         const { peerId, description } = JSON.parse(JSON.parse(message.body));
-
         const connection = pcListMap.get(peerId);
-
         const remotePeerConnection = connection ? connection.remote : undefined;
+
         if (remotePeerConnection && role.current === 'mentor') {
-          await remotePeerConnection!.receiveOfferCallback(
+          await remotePeerConnection.receiveOfferCallback(
             description,
             (answerText) => {
               publish(ANSWER_PUBLISH_URL(classroomId), answerText);
@@ -169,6 +169,7 @@ export default function VideoComponent({ classroomId }: Props) {
     subscribe(ANSWER_SUBSCRIBE_URL(classroomId), async (message: IMessage) => {
       const { peerId, description } = JSON.parse(JSON.parse(message.body));
       const localPeerConnection = pcListMap.get(peerId)?.local;
+
       if (localPeerConnection && role.current === 'mentee') {
         await localPeerConnection.receiveAnswerCallback(description);
       }
@@ -177,6 +178,7 @@ export default function VideoComponent({ classroomId }: Props) {
     subscribe(TRICKLE_SUBSCRIBE_URL(classroomId), async (message: IMessage) => {
       const { peerId, candidate } = JSON.parse(JSON.parse(message.body));
       const connection = pcListMap.get(peerId);
+
       if (connection?.remote && role.current === 'mentor') {
         await connection.remote.receiveIceCandidateCallback(candidate);
       }
