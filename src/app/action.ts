@@ -1,12 +1,14 @@
 'use server';
 
+import { BASE_HEADERS, BASE_URL } from '@/constant';
 import {
   ActionResType,
-  ChangeProfileFormType,
+  BaseResType,
   SubmitReviewFormType,
-  openMentoringFormType,
   AuthType,
+  ChangeProfileFormType,
 } from '@/types/hanaHakdang';
+import { cookies } from 'next/headers';
 
 //검색 서버액션 예시
 export async function handleSearchAction(formData: FormData) {
@@ -42,32 +44,22 @@ export async function submitReview(
   };
 }
 
-export async function openMentoring(
-  prevState: ActionResType<openMentoringFormType, string>,
-  formData: FormData
-): Promise<ActionResType<openMentoringFormType, string>> {
-  const value: openMentoringFormType = {
-    classTitle: formData.get('classTitle') as string,
-    classDescription: formData.get('classDescription') as string,
-    date: formData.get('date') as string,
-    startTime: formData.get('startTime') as string,
-    endTime: formData.get('endTime') as string,
-    maxMentee: Number(formData.get('maxMentee')),
-    category: formData.get('category') as string,
-    tags: JSON.parse(formData.get('tags') as string),
-    image: formData.get('image') as File | null,
-  };
-  const message = '멘토링 등록 액션';
-  return {
-    value: value,
-    message: message,
-    isError: false,
-  };
-}
-
 export async function getMyAuthData(): Promise<AuthType> {
-  return {
-    name: '김하나',
-    userId: 1,
-  };
+  const cookieStore = await cookies();
+  const jsessionIdCookie = cookieStore.get('JSESSIONID');
+
+  const res = await fetch(`${BASE_URL}/user-info`, {
+    method: 'GET',
+    headers: {
+      ...BASE_HEADERS,
+      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
+    },
+  });
+
+  const data = (await res.json()) as BaseResType<AuthType>;
+  if (!res.ok) {
+    console.log(`Failed to fetch user info: ${data.message}`);
+  }
+
+  return data.result;
 }
