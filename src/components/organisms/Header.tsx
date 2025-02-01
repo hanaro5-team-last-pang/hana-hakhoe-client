@@ -13,12 +13,6 @@ interface Props {
 export default function Header({ children }: Props) {
   const loginStatus = true; // 로그인 상태 관리는 전역 상태 관리로 이루어질 예정
   const items = ['start', 'modify', 'start'];
-  const userInfo = {
-    username: '정중일',
-    userAge: 45,
-    userImage: 'https://placehold.co/25x25',
-    userRole: 'mentor',
-  };
 
   return (
     <div className="w-screen fixed bg-inherit z-20">
@@ -43,7 +37,7 @@ export default function Header({ children }: Props) {
                   lectureTitle="주식 투자 성공기"
                   lectureTime="2024-01-10 15:00"
                 />
-                <ProfileDropdown userInfo={userInfo} />
+                <ProfileDropdown />
               </div>
             ) : (
               <LinkButton

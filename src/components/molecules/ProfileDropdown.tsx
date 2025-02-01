@@ -2,44 +2,34 @@
 
 import Button from '@/components/atoms/Button';
 import Dropdown from '@/components/atoms/Dropdown';
+import { useAuth } from '@/context/AuthContext';
 import { HiOutlineUserCircle } from 'react-icons/hi2';
 import { PiShoppingBagOpen, PiUser, PiArrowSquareOut } from 'react-icons/pi';
-import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-interface ProfileDropdownProps {
-  userInfo: {
-    username: string;
-    userAge: number;
-    userImage: string;
-    userRole: string;
-  };
-}
-
 function deleteCookie(name: string) {
   document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
-  console.log('로그아웃되었습니다.');
+  console.log(`${name} 쿠키가 삭제되었습니다.`);
   redirect('/login');
 }
 
-export default function ProfileDropdown({ userInfo }: ProfileDropdownProps) {
+export default function ProfileDropdown() {
+  const { role, name } = useAuth();
+  //TODO: 임시 이미지 설정, userImage 받아 와야함
+  const userImage = 'https://placehold.co/40x40/orange/white';
+
   const menuItems = [
     <div>
-      <div className="flex items-center mr-10 mb-1">
-        <div className="relative w-4 h-4">
-          <Image
-            className="rounded-full object-contain"
-            src={userInfo.userImage}
-            alt="Profile Image"
-            fill
-          />
+      <div className="flex items-center mr-10 mt-2">
+        <div className="relative text-2xl">
+          <HiOutlineUserCircle />
         </div>
-        <div className="mx-1 text-xs font-bold">{userInfo.username}</div>
-        <HiOutlineUserCircle />
-        <div className="text-[9px] mx-1">{userInfo.userAge}세</div>
+        <p className="mx-1 text-sm font-semibold">
+          {name} {role === 'mentor' ? '멘토' : '회원'}님
+        </p>
       </div>
-      <hr className="border-t border-gray-300 mb-3" />
+      <hr className="border-t border-gray-300 mt-3 mb-3" />
     </div>,
     <Link className="flex my-2 items-center" href="/mypage/open-mentoring">
       <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
@@ -50,9 +40,7 @@ export default function ProfileDropdown({ userInfo }: ProfileDropdownProps) {
     <Link
       className="flex my-2 items-center"
       href={
-        userInfo.userRole === 'mentor'
-          ? '/mypage/card-settings'
-          : '/mypage/account-settings'
+        role === 'mentor' ? '/mypage/card-settings' : '/mypage/account-settings'
       }
     >
       <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
@@ -63,7 +51,7 @@ export default function ProfileDropdown({ userInfo }: ProfileDropdownProps) {
     <Button
       className="flex my-2 items-center"
       type="button"
-      onClick={() => deleteCookie('jenkins-timestamper-offset')}
+      onClick={() => deleteCookie('JSESSIONID')}
     >
       <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
         <PiArrowSquareOut />
@@ -77,7 +65,7 @@ export default function ProfileDropdown({ userInfo }: ProfileDropdownProps) {
       menuButton={
         <img
           className="w-full h-full rounded-full"
-          src={userInfo.userImage}
+          src={userImage}
           alt="Profile Image"
         />
       }
