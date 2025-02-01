@@ -85,10 +85,9 @@ export default function VideoComponent({ classroomId }: Props) {
   const createVideoElement = (id: string) => {
     const videoElement = document.createElement('video');
     videoElement.id = id;
+    videoElement.className = 'rounded-xl aspect-[16/9] object-cover';
     videoElement.setAttribute('autoPlay', 'true');
     videoElement.setAttribute('playsInline', 'true');
-    videoElement.style.width = '100%';
-    videoElement.style.height = 'auto';
 
     const videoContainer = document.getElementById('remote-video-container');
     if (videoContainer) {
@@ -246,6 +245,62 @@ export default function VideoComponent({ classroomId }: Props) {
     });
   }, [classroomId, stream]);
 
+  const startScreenStream = async () => {
+    try {
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: true,
+      });
+
+      pcListMap.forEach((pc) => {
+        const videoSender = pc.local
+          ? pc.local
+              ._pConn!.getSenders()
+              .find((sender) => sender.track?.kind === 'video')
+          : pc
+              .remote!._pConn!.getSenders()
+              .find((sender) => sender.track?.kind === 'video');
+
+        if (videoSender) {
+          videoSender.replaceTrack(screenStream.getVideoTracks()[0]);
+        }
+      });
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = screenStream;
+      }
+
+      screenStream.getVideoTracks()[0].onended = async () => {
+        screenStream.getTracks().forEach((track) => track.stop());
+
+        const userStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+
+        pcListMap.forEach((pc) => {
+          const videoSender = pc.local
+            ? pc.local
+                ._pConn!.getSenders()
+                .find((sender) => sender.track?.kind === 'video')
+            : pc
+                .remote!._pConn!.getSenders()
+                .find((sender) => sender.track?.kind === 'video');
+
+          if (videoSender) {
+            videoSender.replaceTrack(userStream.getVideoTracks()[0]);
+          }
+        });
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = userStream;
+        }
+      };
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const toggleVideo = () => {
     if (videoRef.current!.srcObject) {
       videoRef.current!.srcObject = null;
@@ -323,6 +378,14 @@ export default function VideoComponent({ classroomId }: Props) {
           anchor="bottom"
           menuItemsClassName="bg-white rounded-lg drop-shadow scrollbar-hide border border-gray-200 px-2 z-30 w-[450px] my-2"
         />
+        {role === 'mentor' && (
+          <Button
+            type="button"
+            text="화면 공유"
+            className="rounded-full bg-ourOrange text-white text-sm font-medium px-4 py-2 shadow-md"
+            onClick={startScreenStream}
+          />
+        )}
         {role === 'mentor' && (
           <Button
             type="submit"
