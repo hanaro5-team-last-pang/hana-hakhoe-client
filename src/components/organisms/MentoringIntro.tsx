@@ -12,11 +12,14 @@ interface Props {
   lectureData: LectureType;
 }
 
+//삭제 예정
+const DEFAULT_IMAGE_URL = '/img_landing.png';
+
 export default function MentoringIntro(props: Props) {
   const {
-    tagTitle,
-    tagList,
-    startDate,
+    category,
+    tags,
+    startTime,
     mentorName,
     duration,
     currParticipants,
@@ -25,20 +28,23 @@ export default function MentoringIntro(props: Props) {
     thumbnailImgUrl,
   } = props.lectureData;
 
+  // thumbnailImgUrl이 없으면 기본 이미지 사용
+  const imageUrl = thumbnailImgUrl || DEFAULT_IMAGE_URL;
+
   return (
     <div>
       <div className="w-full bg-black py-5">
         <div className="wrapper flex justify-between items-center">
           <div className="flex-1 flex flex-col">
-            <div className="flex items-end">
+            <div className="flex md:items-end md:flex-row items-start gap-2 flex-col">
               <Badge
-                text={tagTitle}
+                text={category}
                 className="bg-red-500 text-white text-sm rounded-lg mr-3"
               />
-              <div className="flex gap-3">
+              <div className="flex gap-3 sm:flex-row flex-col">
                 <IconBadge
                   icon={<FaClock />}
-                  text={dayjs(startDate).format('YYYY년 MM월 DD일')}
+                  text={dayjs(startTime).format('YYYY-MM-DD HH시 mm분')}
                   gapLength="2"
                   iconClassName="text-amber-500"
                   textClassName="text-sm text-gray-400"
@@ -64,7 +70,7 @@ export default function MentoringIntro(props: Props) {
               <div className="text-lg text-gray-400 my-2">{`${mentorName} 멘토님`}</div>
             </div>
             <div className="flex items-start my-2">
-              {tagList.map((items, index) => {
+              {tags.map((items, index) => {
                 return (
                   <Badge
                     text={`#${items}`}
@@ -76,13 +82,13 @@ export default function MentoringIntro(props: Props) {
             </div>
           </div>
           {/* 오른쪽 div */}
-          <div className="flex flex-col items-center rounded-2xl bg-white border border-gray-400 overflow-hidden relative">
-            <div className="relative w-[280px] h-[210px]">
+          <div className="flex flex-col items-center rounded-2xl bg-white border border-gray-400 overflow-hidden relative aspect-[4/3]">
+            <div className="relative w-[280px] h-[210px] ">
               <Image
-                src={thumbnailImgUrl}
+                src={imageUrl}
                 alt="멘토 명함"
-                layout="fill"
-                className="object-fit"
+                fill
+                className="object-cover"
               />
               <div className="absolute bottom-0 right-0 p-2">
                 <Button

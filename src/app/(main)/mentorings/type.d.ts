@@ -2,30 +2,21 @@ export type LectureType = {
   lectureId: number;
   mentorName: string;
   category: string;
+  tags: string[];
   title: string;
   description: string;
-  startDate: Date;
-  endDate: Date;
+  startTime: string;
+  endTime: string;
   duration: number;
   currParticipants: number;
   maxParticipants: number;
   isFull: boolean;
   thumbnailImgUrl: string;
-  tagTitle: string;
-  tagList: string[];
 };
 
-export type CardInfoType = {
-  key: string;
-  value: string;
-};
-
-export type CardType = {
-  mentorName: string;
-  shortIntroduction: string;
-  mentorProfileImgUrl: string | null;
-  simpleInfo: CardInfoType[];
-  detailInfo: CardInfoType[];
+export type LectureListResponse = {
+  totalCount: number;
+  lectureList: LectureType[];
 };
 
 export type SubScoreType = {

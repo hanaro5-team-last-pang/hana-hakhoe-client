@@ -1,3 +1,5 @@
+import { getLectureList } from '@/app/(main)/mentorings/actions';
+import { LectureType } from '@/app/(main)/mentorings/type';
 import IconButton from '@/components/atoms/IconButton';
 import LinkButton from '@/components/atoms/LinkButton';
 import HeaderTab from '@/components/molecules/HeaderTab';
@@ -6,12 +8,34 @@ import MainPageText from '@/components/molecules/MainpageText';
 import CardView from '@/components/organisms/CardView';
 import Footer from '@/components/organisms/Footer';
 import Header from '@/components/organisms/Header';
-import { cardData, iconButtonData, newsData } from '@/utils/dummy';
+import { iconButtonData, newsData } from '@/utils/dummy';
+import dayjs from 'dayjs';
 import landing from 'public/img_landing_3.png';
 import banner from 'public/img_main_banner.png';
 import Image from 'next/image';
 
-export default function Home() {
+//TODO: 임시 default image
+const DEFAULT_IMAGE_URL = '/img_landing.png';
+
+const LectureToCardData = (lecture: LectureType) => {
+  return {
+    id: lecture.lectureId.toString(),
+    title: lecture.title,
+    imageSrc: lecture.thumbnailImgUrl || DEFAULT_IMAGE_URL,
+    mentor_name: lecture.mentorName,
+    start_time: dayjs(lecture.startTime).format('YYYY-MM-DD'),
+    duration: lecture.duration,
+    participants: lecture.currParticipants,
+    max_participants: lecture.maxParticipants,
+    category: lecture.category,
+    badgeClassName: 'bg-ourOrange',
+  };
+};
+
+export default async function Home() {
+  const result = await getLectureList();
+  const cardData = result.map(LectureToCardData);
+
   return (
     <>
       <Header>
