@@ -24,7 +24,7 @@ export default function Header({ children }: Props) {
                 src="/logo_header.png"
                 width={128}
                 height={26}
-                alt="하나학당 로고"
+                alt="하나학회 로고"
               />
             </Link>
           </div>
