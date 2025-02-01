@@ -88,7 +88,7 @@ export default class RemotePeerConnection {
           await Promise.race([
             videoElement.play(),
             new Promise((_, reject) =>
-              setTimeout(() => reject(new Error('play error')), 5000)
+              setTimeout(() => reject(new Error('play error')), 8000)
             ),
           ]);
         } catch {

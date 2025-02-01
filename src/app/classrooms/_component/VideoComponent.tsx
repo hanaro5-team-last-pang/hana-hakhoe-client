@@ -1,5 +1,6 @@
 'use client';
 
+import Button from '@/components/atoms/Button';
 import Dropdown from '@/components/atoms/Dropdown';
 import {
   ANSWER_PUBLISH_URL,
@@ -22,6 +23,7 @@ import LocalPeerConnection from '@/webrtc/LocalPeerConnection';
 import RemotePeerConnection from '@/webrtc/RemotePeerConnection';
 import { IMessage } from '@stomp/stompjs';
 import { v4 as uuidv4 } from 'uuid';
+import { useRouter } from 'next/navigation';
 import React, {
   useEffect,
   useState,
@@ -35,6 +37,7 @@ interface Props {
 }
 
 export default function VideoComponent({ classroomId }: Props) {
+  const router = useRouter();
   const { videoRef, changeDevice, stream } = useLocalVideo();
   const { videoDevices, audioDevices } = useMediaDevices();
   const isConnected = useContext(StompIsConnectedContext);
@@ -48,21 +51,24 @@ export default function VideoComponent({ classroomId }: Props) {
   >(new Map());
   const currentKey = useRef<string>(uuidv4());
   const mentorKey = useRef<string | null>(null);
-  const role = useRef<'mentor' | 'mentee' | null>(null);
+  const [role, setRole] = useState<'mentor' | 'mentee' | null>(null);
 
   useEffect(() => {
     if (isConnected && stream) {
       const storedMentorKey = localStorage.getItem('mentorKey');
       if (!storedMentorKey) {
-        role.current = 'mentor';
+        setRole('mentor');
         localStorage.setItem('mentorKey', currentKey.current);
         mentorKey.current = currentKey.current;
         subscribeEnter();
       } else {
-        role.current = 'mentee';
+        setRole('mentee');
         mentorKey.current = storedMentorKey;
-        publish(ENTER_PUBLISH_URL(classroomId), currentKey.current);
         subscribeEnter();
+        publish(ENTER_PUBLISH_URL(classroomId), {
+          type: 'Enter',
+          key: currentKey.current,
+        });
       }
     }
   }, [isConnected, stream]);
@@ -144,10 +150,23 @@ export default function VideoComponent({ classroomId }: Props) {
 
   const subscribeEnter = useCallback(() => {
     subscribe(ENTER_SUBSCRIBE_URL(classroomId), async (message: IMessage) => {
-      const key: string = JSON.parse(message.body);
-      if (key !== currentKey.current) await handleRemotePeer(key);
-      else {
-        await handleLocalPeer();
+      const { type, key } = JSON.parse(message.body);
+      if (type === 'Enter') {
+        if (key !== currentKey.current) await handleRemotePeer(key);
+        else {
+          await handleLocalPeer();
+        }
+      }
+
+      if (type === 'Close' && key !== currentKey.current) {
+        pcListMap.forEach(({ local, remote }) => {
+          local?.close();
+          remote?.close();
+        });
+
+        pcListMap.clear();
+
+        router.replace(`/classrooms/${classroomId}/review`);
       }
     });
 
@@ -255,6 +274,22 @@ export default function VideoComponent({ classroomId }: Props) {
     </button>
   ));
 
+  const closeClassrooms = () => {
+    publish(ENTER_PUBLISH_URL(classroomId), {
+      type: 'Close',
+      key: currentKey.current,
+    });
+
+    pcListMap.forEach(({ local, remote }) => {
+      local?.close();
+      remote?.close();
+    });
+
+    pcListMap.clear();
+    localStorage.removeItem('mentorKey');
+    router.push(`/mentorings/${classroomId}`);
+  };
+
   return (
     <div className="overflow-y-auto flex flex-col scrollbar-hide">
       <div className="flex justify-center">
@@ -288,6 +323,14 @@ export default function VideoComponent({ classroomId }: Props) {
           anchor="bottom"
           menuItemsClassName="bg-white rounded-lg drop-shadow scrollbar-hide border border-gray-200 px-2 z-30 w-[450px] my-2"
         />
+        {role === 'mentor' && (
+          <Button
+            type="submit"
+            text="강의 종료"
+            className="rounded-full bg-ourOrange text-white text-sm font-medium px-4 py-2 shadow-md"
+            onClick={closeClassrooms}
+          />
+        )}
       </div>
     </div>
   );
