@@ -1,27 +1,82 @@
 'use client';
 
+import { getProfile, ModifyProfile } from '@/app/(main)/mypage/actions';
+import {
+  ProfileRequestType,
+  ProfileResponseType,
+} from '@/app/(main)/mypage/type';
 import Button from '@/components/atoms/Button';
 import MyCardCareerForm from '@/components/template/MyCardCareerForm';
 import MyCardIntroductionForm from '@/components/template/MyCardIntroductionForm';
 import MyCardProfileForm from '@/components/template/MyCardProfileForm';
+import { useAuth } from '@/context/AuthContext';
 import { FaQuoteLeft, FaQuoteRight } from 'react-icons/fa6';
 import { RiPencilFill } from 'react-icons/ri';
-import { useState } from 'react';
+import { toast } from 'react-toastify';
+import { startTransition, useActionState, useEffect, useState } from 'react';
 
 export default function Page() {
-  const loginUser = '정중일';
+  const { name } = useAuth();
+  const loginUser = name;
   const userImage = 'https://placehold.co/25x25';
   const [modifyMode, setModifyMode] = useState(false);
+  const [profileData, setProfileData] = useState<ProfileResponseType | null>(
+    null
+  );
+
+  const [, formAction] = useActionState(ModifyProfile, {
+    value: {
+      shortIntroduction: '',
+      simpleInfo: [],
+      detailInfo: [],
+    },
+    message: '명함 수정',
+    isError: false,
+  });
+
+  // 프로필 데이터 가져오기
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const profile = await getProfile();
+      setProfileData(profile);
+
+      if (profile.short_introduction) {
+        setOneLineIntroduction(profile.short_introduction);
+        setNewOneLineIntroduction(profile.short_introduction);
+      }
+      if (profile.detail_info) {
+        const introductionValue =
+          profile.detail_info[0]?.value || '자신의 소개에 대해 입력하세요';
+        const careerValue =
+          profile.detail_info[1]?.value || '자신의 이력에 대해 입력하세요';
+
+        setNewIntroduction(introductionValue);
+        setIntroduction(introductionValue);
+        setNewCareer(careerValue);
+        setCareer(careerValue);
+      }
+      if (profile.simple_info) {
+        setSimpleInfo(profile.simple_info || []);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  console.log(profileData);
+
+  // 상태 설정
   const [oneLineIntroduction, setOneLineIntroduction] =
-    useState('한 줄 소개를 입력하세요');
-  const [newOneLineIntroduction, setNewOneLineIntroduction] =
     useState<string>('한 줄 소개를 입력하세요');
-  const [introduction, setIntroduction] =
-    useState('자신의 소개에 대해 입력하세요');
-  const [newIntroduction, setNewIntroduction] =
-    useState<string>('자신의 소개에 대해 입력하세요');
-  const [career, setCareer] = useState('자신의 이력에 대해 입력하세요');
-  const [newCareer, setNewCareer] = useState('자신의 이력에 대해 입력하세요');
+  const [newOneLineIntroduction, setNewOneLineIntroduction] =
+    useState<string>(oneLineIntroduction);
+  const [simpleInfo, setSimpleInfo] = useState<
+    { key: string; value: string }[]
+  >([]);
+
+  const [introduction, setIntroduction] = useState<string>('');
+  const [newIntroduction, setNewIntroduction] = useState<string>(introduction);
+  const [career, setCareer] = useState<string>('');
+  const [newCareer, setNewCareer] = useState<string>(career);
   const [showNewImage, setShowNewImage] = useState<string | null>(null);
   const [newImage, setNewImage] = useState<File | null>(null);
 
@@ -29,28 +84,37 @@ export default function Page() {
     setModifyMode(true);
   };
 
-  const handleSubmitNewData = () => {
-    if (
-      newOneLineIntroduction ||
-      newIntroduction ||
-      newCareer ||
-      newImage ||
-      showNewImage
-    ) {
-      setOneLineIntroduction(newOneLineIntroduction);
-      setIntroduction(newIntroduction);
-      setCareer(newCareer);
-      setNewImage(newImage);
-      setShowNewImage(showNewImage);
-    }
-    setModifyMode(false);
-  };
-
   const handleCancelNewData = () => {
     setNewOneLineIntroduction(oneLineIntroduction);
     setNewIntroduction(introduction);
     setNewCareer(career);
     setShowNewImage(null);
+    setModifyMode(false);
+  };
+
+  const handleSubmitNewData = async () => {
+    const value: ProfileRequestType = {
+      shortIntroduction: newOneLineIntroduction,
+      simpleInfo: simpleInfo,
+      detailInfo: [
+        { key: '소개', value: newIntroduction },
+        { key: '이력', value: newCareer },
+      ],
+    };
+
+    startTransition(async () => {
+      try {
+        await formAction(value);
+        toast.success('명함 수정을 완료했습니다.');
+      } catch {
+        toast.error('명함 수정에 실패했습니다.');
+      }
+    });
+
+    // 서버 응답 처리 후 상태 업데이트
+    setOneLineIntroduction(newOneLineIntroduction);
+    setIntroduction(newIntroduction);
+    setCareer(newCareer);
     setModifyMode(false);
   };
 
@@ -110,6 +174,8 @@ export default function Page() {
             setNewImage={setNewImage}
             showNewImage={showNewImage!}
             setShowNewImage={setShowNewImage}
+            simpleInfo={simpleInfo} // simple_info 전달
+            setSimpleInfo={setSimpleInfo}
           />
         </div>
         <MyCardIntroductionForm
@@ -119,6 +185,7 @@ export default function Page() {
           setNewIntroduction={setNewIntroduction}
         />
       </div>
+
       <MyCardCareerForm
         modifyMode={modifyMode}
         career={career}

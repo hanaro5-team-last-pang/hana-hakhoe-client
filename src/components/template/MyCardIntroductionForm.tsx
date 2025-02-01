@@ -16,13 +16,13 @@ export default function MyCardIntroductionForm({
       <div className="text-xl font-semibold">소개</div>
       {!modifyMode ? (
         <textarea
-          className="text-md my-3 text-gray-400 w-full bg-inherit focus:outline-none resize-none"
+          className="text-md my-3 text-gray-700 w-full h-3/4 bg-inherit focus:outline-none resize-none"
           value={introduction}
           readOnly
         />
       ) : (
         <textarea
-          className="text-md bg-inherit text-gray-400 px-2 my-3 w-full outline outline-2 outline-blue-400 focus:outline-blue-400 focus:outline-2"
+          className="text-md bg-inherit text-gray-700 px-2 my-3 w-full h-3/4 outline outline-2 outline-blue-400 focus:outline-blue-400 focus:outline-2"
           value={newIntroduction}
           onChange={(e) => setNewIntroduction(e.target.value)}
         />
