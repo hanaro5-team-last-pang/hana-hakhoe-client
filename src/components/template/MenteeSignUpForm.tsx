@@ -118,7 +118,7 @@ export default function MenteeSignUpForm() {
       />
       <div className="flex justify-center gap-2 my-2">
         <div className="text-xs text-gray-600">
-          이미 하나학당의 회원이신가요?
+          이미 하나학회의 회원이신가요?
         </div>
         <Link href="/login">
           <IconBadge
