@@ -5,21 +5,8 @@ import SearchBar from '@/components/template/SearchBar';
 import { category } from '@/utils/dummy';
 import dayjs from 'dayjs';
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
-
-export default async function Page(props: { searchParams: SearchParams }) {
-  const searchParams = await props.searchParams;
-  const pageParam = searchParams.page;
-
-  let pageNum: number = 0;
-  try {
-    pageNum = Number(pageParam);
-  } catch (e) {
-    console.error(e);
-    pageNum = 0;
-  }
-
-  const newsData = await getNewsData(pageNum);
+export default async function Page() {
+  const newsData = await getNewsData();
 
   return (
     <>

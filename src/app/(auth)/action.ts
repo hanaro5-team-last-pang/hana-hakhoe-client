@@ -1,6 +1,7 @@
 'use server';
 
 import { BASE_URL } from '@/constant';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import {
   MenteeSignUpType,
@@ -112,5 +113,15 @@ export async function login(
     console.log(data);
     return { value: value, message: data, isError: true };
   }
+
+  const c = res.headers.getSetCookie();
+  const cookieStore = await cookies();
+  const slices = c[0].split(';')[0].split('=');
+  cookieStore.set({
+    name: slices[0],
+    value: slices[1],
+    httpOnly: true,
+  });
+
   redirect('/');
 }
