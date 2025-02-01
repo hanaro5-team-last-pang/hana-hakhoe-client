@@ -6,7 +6,7 @@ import { IceCandidateType, SignalType } from '@/webrtc/type';
  */
 export default class RemotePeerConnection {
   private readonly _remotePeerId: string;
-  private _pConn: RTCPeerConnection | null = null;
+  public _pConn: RTCPeerConnection | null = null;
 
   constructor(remotePeerId: string) {
     this._remotePeerId = remotePeerId;
@@ -16,7 +16,10 @@ export default class RemotePeerConnection {
     this._pConn = new RTCPeerConnection(config);
   }
 
-  private async sendAnswer(sendFn: (text: string) => void) {
+  private async sendAnswer(
+    sendFn: (text: string) => void,
+    localPeerId: string
+  ) {
     if (!this._pConn) {
       throw new Error('원격 연결을 찾을 수 없습니다.');
     }
@@ -25,6 +28,7 @@ export default class RemotePeerConnection {
     const answerSignal: SignalType = {
       peerId: this._remotePeerId,
       description: answer,
+      remoteId: localPeerId,
     };
     sendFn(JSON.stringify(answerSignal));
   }
@@ -56,13 +60,14 @@ export default class RemotePeerConnection {
 
   public async receiveOfferCallback(
     offer: RTCSessionDescriptionInit,
-    sendFn: (text: string) => void
+    sendFn: (text: string) => void,
+    localPeerId: string
   ) {
     if (!this._pConn) {
       throw new Error('원격 연결을 찾을 수 없습니다.');
     }
     await this._pConn.setRemoteDescription(new RTCSessionDescription(offer));
-    await this.sendAnswer(sendFn);
+    await this.sendAnswer(sendFn, localPeerId);
   }
 
   public addLocalTrack(localStream: MediaStream) {
@@ -79,7 +84,17 @@ export default class RemotePeerConnection {
     this._pConn.addEventListener('track', async (e) => {
       if (!videoElement.srcObject) {
         videoElement.srcObject = e.streams[0];
-        await videoElement.play();
+        try {
+          await Promise.race([
+            videoElement.play(),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('play error')), 5000)
+            ),
+          ]);
+        } catch {
+          videoElement.remove();
+          this._pConn?.close();
+        }
       }
     });
   }

@@ -107,22 +107,26 @@ export default function VideoComponent({ classroomId }: Props) {
     return peerConnection;
   };
 
-  const handleLocalPeer = async () => {
+  const handleLocalPeer = async (uniqueStr?: string, remoteId?: string) => {
     const localPeerConnection = initializePeerConnection(
-      currentKey.current,
+      uniqueStr ? uniqueStr : currentKey.current,
       false
     ) as LocalPeerConnection;
     const mentorVideoElement = createVideoElement('mentor-video');
 
     localPeerConnection.addRemoteTrack(mentorVideoElement);
-    pcListMap.set(currentKey.current, {
+    pcListMap.set(uniqueStr ? uniqueStr : currentKey.current, {
       local: localPeerConnection,
       remote: null,
     });
 
-    await localPeerConnection.sendOffer((offer) => {
-      publish(SIGNALING_PUBLISH_URL(classroomId), offer);
-    }, currentKey.current);
+    await localPeerConnection.sendOffer(
+      (offer) => {
+        publish(SIGNALING_PUBLISH_URL(classroomId), offer);
+      },
+      uniqueStr ? uniqueStr : currentKey.current,
+      remoteId
+    );
   };
 
   const handleRemotePeer = async (key: string) => {
@@ -150,26 +154,61 @@ export default function VideoComponent({ classroomId }: Props) {
     subscribe(
       SIGNALING_SUBSCRIBE_URL(classroomId),
       async (message: IMessage) => {
-        const { peerId, description } = JSON.parse(JSON.parse(message.body));
+        const { peerId, remoteId, description } = JSON.parse(
+          JSON.parse(message.body)
+        );
         const connection = pcListMap.get(peerId);
-        const remotePeerConnection = connection ? connection.remote : undefined;
+
+        let remotePeerConnection = connection ? connection.remote : undefined;
+
+        if (remoteId && remoteId !== currentKey.current) {
+          return;
+        }
+
+        if (remoteId && remoteId === currentKey.current) {
+          if (!remotePeerConnection) {
+            if (!pcListMap.has(peerId)) {
+              remotePeerConnection = initializePeerConnection(
+                peerId,
+                true
+              ) as RemotePeerConnection;
+              const videoElement = createVideoElement(`video-${peerId}`);
+
+              remotePeerConnection.addRemoteTrack(videoElement);
+              pcListMap.set(peerId, {
+                local: null,
+                remote: remotePeerConnection,
+              });
+            }
+          }
+        }
 
         if (remotePeerConnection) {
           await remotePeerConnection.receiveOfferCallback(
             description,
             (answerText) => {
               publish(ANSWER_PUBLISH_URL(classroomId), answerText);
-            }
+            },
+            currentKey.current
           );
         }
       }
     );
 
     subscribe(ANSWER_SUBSCRIBE_URL(classroomId), async (message: IMessage) => {
-      const { peerId, description } = JSON.parse(JSON.parse(message.body));
+      const { peerId, remoteId, description } = JSON.parse(
+        JSON.parse(message.body)
+      );
       const localPeerConnection = pcListMap.get(peerId)?.local;
 
       if (localPeerConnection) {
+        if (
+          localPeerConnection.remotePeerId &&
+          localPeerConnection.remotePeerId !== remoteId
+        ) {
+          await handleLocalPeer(uuidv4(), remoteId);
+        }
+        localPeerConnection.setRemoteId = remoteId;
         await localPeerConnection.receiveAnswerCallback(description);
       }
     });

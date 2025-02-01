@@ -19,7 +19,11 @@ export default class LocalPeerConnection {
     await this._pConn.setRemoteDescription(new RTCSessionDescription(answer));
   }
 
-  public async sendOffer(sendFn: (text: string) => void, localPeerId: string) {
+  public async sendOffer(
+    sendFn: (text: string) => void,
+    localPeerId: string,
+    remotePeerId?: string
+  ) {
     if (!this._pConn) {
       throw new Error('로컬 연결을 찾을 수 없습니다.');
     }
@@ -29,6 +33,7 @@ export default class LocalPeerConnection {
       const offerSignal: SignalType = {
         peerId: localPeerId,
         description: offer,
+        remoteId: remotePeerId,
       };
       sendFn(JSON.stringify(offerSignal));
     } catch (error) {
