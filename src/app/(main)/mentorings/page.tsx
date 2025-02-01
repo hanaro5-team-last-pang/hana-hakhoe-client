@@ -1,10 +1,34 @@
+import { getLectureList } from '@/app/(main)/mentorings/actions';
+import { LectureType } from '@/app/(main)/mentorings/type';
 import CheckboxList from '@/components/molecules/CheckboxList';
 import CardView from '@/components/organisms/CardView';
 import MentoringList from '@/components/organisms/MentoringList';
 import SearchBar from '@/components/template/SearchBar';
-import { age_category, cardData, category } from '@/utils/dummy';
+import { age_category, category } from '@/utils/dummy';
+import dayjs from 'dayjs';
 
-export default function Page() {
+//TODO: 임시 default image
+const DEFAULT_IMAGE_URL = '/img_landing.png';
+
+const LectureToCardData = (lecture: LectureType) => {
+  return {
+    id: lecture.lectureId.toString(),
+    title: lecture.title,
+    imageSrc: lecture.thumbnailImgUrl || DEFAULT_IMAGE_URL,
+    mentor_name: lecture.mentorName,
+    start_time: dayjs(lecture.startTime).format('YYYY-MM-DD HH시 mm분'),
+    duration: lecture.duration,
+    participants: lecture.currParticipants,
+    max_participants: lecture.maxParticipants,
+    category: lecture.category,
+    badgeClassName: 'bg-ourGreen',
+  };
+};
+
+export default async function Page() {
+  const result = await getLectureList();
+  const cardData = result.map(LectureToCardData);
+
   return (
     <>
       <div className="wrapper flex w-full my-10 gap-10 items-start">
@@ -16,7 +40,6 @@ export default function Page() {
             </div>
             <div className="grid grid-rows-6 gap-6 gap-y-8 mt-4">
               {cardData.map((card) => (
-                // 화면 크기에 따라 조건부 렌더링
                 <div key={card.id} className="sm:hidden">
                   <CardView {...card} id={`/mentorings/${card.id}`} />
                 </div>

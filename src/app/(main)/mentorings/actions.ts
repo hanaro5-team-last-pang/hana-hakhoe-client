@@ -1,95 +1,99 @@
 'use server';
 
 import {
-  CardType,
   FaqFormType,
   FaqResponseType,
+  LectureListResponse,
   LectureType,
   ReviewPageResponseType,
 } from '@/app/(main)/mentorings/type';
+import { ProfileResponseType } from '@/app/(main)/mypage/type';
 import { BASE_HEADERS, BASE_URL } from '@/constant';
 import { ActionResType, BaseResType } from '@/types/hanaHakdang';
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-// TODO: 개발용
-const sleep = () => new Promise((resolve) => setTimeout(resolve, 500));
+//전체 멘토링 조회
+export async function getLectureList() {
+  const cookieStore = await cookies();
+  const jsessionIdCookie = cookieStore.get('JSESSIONID');
 
-export async function getLectureData(lectureId: number) {
-  // TODO: 추후 삭제 필요
-  await sleep();
-
-  return {
-    lectureId: 1,
-    title: '어서오세요 동물의 숲',
-    category: '',
-    isFull: false,
-    description: '안녕하세요 동물의 숲 강의입니다.',
-    mentorName: '한성민',
-    thumbnailImgUrl: '/img_landing.png',
-    startDate: new Date('2025-01-23'),
-    endDate: new Date('2025-01-25'),
-    currParticipants: 3,
-    maxParticipants: 5,
-    duration: 1,
-    tagTitle: '마감임박',
-    tagList: ['하이', '방가'],
-  };
-
-  const res = await fetch(BASE_URL + `/lectures/${lectureId}`, {
-    headers: BASE_HEADERS,
+  const res = await fetch(`${BASE_URL}/lectures`, {
+    method: 'GET',
+    headers: {
+      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
+    },
   });
 
   if (!res.ok) {
     notFound();
   }
 
-  const result: BaseResType<LectureType> = await res.json();
-
-  return result.result;
+  const data = (await res.json()) as BaseResType<LectureListResponse>;
+  return data.result.lectureList;
 }
 
-export async function getProfileCard(lectureId: number) {
-  // TODO: 추후 삭제 필요
-  await sleep();
+//키워드 검색
+export async function getLectureSearch() {
+  const cookieStore = await cookies();
+  const jsessionIdCookie = cookieStore.get('JSESSIONID');
 
-  return {
-    mentorName: '미스터 중',
-    shortIntroduction: '안녕하세요 정중일 멘토입니다.',
-    mentorProfileImgUrl: null,
-    simpleInfo: [
-      { key: '경력', value: '20년' },
-      {
-        key: '스킬',
-        value: 'SPRING, REACT',
-      },
-    ],
-    detailInfo: [
-      {
-        key: '구체적인 경험',
-        value:
-          '하나은행에서 백엔드 개발자를 20년 동안 하다가 한국은행에서 10년동안 인프라를 구축했습니다.',
-      },
-      {
-        key: '추가사항',
-        value: '강사 경력을 통해 방대한 지식을 알기 쉽게 설명해드리겠습니다.',
-      },
-    ],
-  };
-
-  const res = await fetch(BASE_URL + `/profile-card/${lectureId}`);
+  const res = await fetch(`${BASE_URL}/search`, {
+    method: 'GET',
+    headers: {
+      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
+    },
+  });
 
   if (!res.ok) {
     notFound();
   }
 
-  const result: BaseResType<CardType> = await res.json();
+  const data = (await res.json()) as BaseResType<LectureListResponse>;
+  return data.result.lectureList;
+}
 
-  return result.result;
+//멘토링 상세 정보
+export async function getLectureData(lectureId: number) {
+  const cookieStore = await cookies();
+  const jsessionIdCookie = cookieStore.get('JSESSIONID');
+
+  const res = await fetch(BASE_URL + `/lectures/${lectureId}`, {
+    method: 'GET',
+    headers: {
+      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
+    },
+  });
+
+  if (!res.ok) {
+    notFound();
+  }
+
+  const data = (await res.json()) as BaseResType<LectureType>;
+  return data.result;
+}
+
+//멘토링 상세 - 멘토 소개
+export async function getProfileCard(lectureId: number) {
+  const cookieStore = await cookies();
+  const jsessionIdCookie = cookieStore.get('JSESSIONID');
+  const res = await fetch(BASE_URL + `/profile-card/${lectureId}`, {
+    method: 'GET',
+    headers: {
+      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
+    },
+  });
+
+  if (!res.ok) {
+    notFound();
+  }
+
+  const data = (await res.json()) as BaseResType<ProfileResponseType>;
+  return data.result;
 }
 
 export async function getLectureReviews(lectureId: number) {
   // TODO: 추후 삭제 필요
-  await sleep();
 
   return {
     averageScore: 4.7,
@@ -155,7 +159,6 @@ export async function getLectureReviews(lectureId: number) {
 
 export async function getLectureFaqs(lectureId: number) {
   // TODO: 추후 삭제 필요
-  await sleep();
 
   const dummy: FaqResponseType[] = [
     {
