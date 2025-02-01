@@ -1,4 +1,5 @@
 import { getLectureData } from '@/app/(main)/mentorings/actions';
+import { LectureType } from '@/app/(main)/mentorings/type';
 import TabBody from '@/components/molecules/TabBody';
 import MentoringIntro from '@/components/organisms/MentoringIntro';
 import MentoringDescriptionForm from '@/components/template/MentoringDescriptionForm';
@@ -17,7 +18,7 @@ export default async function Page(props: { params: Params }) {
     notFound();
   }
 
-  const lectureData = await getLectureData(lectureId);
+  const lectureData: LectureType = await getLectureData(lectureId);
 
   // 메뉴 Title
   const tabList = [
