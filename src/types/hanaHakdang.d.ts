@@ -10,6 +10,12 @@ export type BaseResType<T> = {
   result: T;
 };
 
+export type AuthType = {
+  userId: number;
+  name: string;
+  role: string;
+};
+
 export type ChatResponseType = {
   readonly userId: number;
   readonly username: string;
@@ -48,31 +54,6 @@ export type CardType = {
   cardTitle: string;
   cardDescription: string;
   cardImageUrl: string;
-};
-
-export type openMentoringFormType = {
-  classTitle: string;
-  classDescription: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  maxMentee: number;
-  category: string;
-  tags: string[];
-  image: File | null;
-};
-
-export type AuthType = {
-  userId: number;
-  name: string;
-};
-
-export type MentoringType = {
-  id: number;
-  mentoringName: string;
-  mentoringDate: Date;
-  mentorName: string;
-  status: string;
 };
 
 export type AccountType = {

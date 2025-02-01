@@ -161,20 +161,20 @@ export const newsData = [
 ];
 
 export const category = [
-  { id: 1, label: 'All' },
-  { id: 2, label: '금융' },
-  { id: 3, label: '경제' },
-  { id: 4, label: '상속' },
-  { id: 5, label: '주식 투자' },
-  { id: 6, label: '디지털 교육' },
+  { id: 1, label: '금융 상품' },
+  { id: 2, label: '디지털 교육' },
+  { id: 3, label: '부동산' },
+  { id: 4, label: '투자' },
+  { id: 5, label: '상속' },
+  { id: 6, label: '은퇴 설계' },
 ];
 
 export const age_category = [
-  { id: 1, label: 'All' },
-  { id: 2, label: '1020' },
-  { id: 3, label: '3040' },
-  { id: 4, label: '5060' },
-  { id: 5, label: '7080' },
+  { id: 1, label: '10대' },
+  { id: 2, label: '20대' },
+  { id: 3, label: '30대' },
+  { id: 4, label: '40대' },
+  { id: 5, label: '50대' },
 ];
 
 export const commentsData = [

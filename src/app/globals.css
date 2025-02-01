@@ -92,3 +92,9 @@ body {
   background: var(--background);
   font-family: 'FontLight'
 }
+
+.custom-toast {
+  top: 63px;
+  right: 5px;
+  position: fixed;
+}
