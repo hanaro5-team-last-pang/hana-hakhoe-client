@@ -33,7 +33,7 @@ export default function Page() {
         <div>
           <div className="text-center font-bold text-3xl">로그인</div>
           <div className="text-center text-sm my-2 text-gray-400">
-            하나학당의 다양한 서비스를 이용하기 위해서는 로그인이 필요합니다.
+            하나학회의 다양한 서비스를 이용하기 위해서는 로그인이 필요합니다.
           </div>
         </div>
         <div className="mt-8 grid grid-cols-1 gap-3">
@@ -78,7 +78,7 @@ export default function Page() {
           />
           <div className="flex justify-center gap-2">
             <div className="text-xs text-gray-600">
-              하나학당이 처음이신가요?
+              하나학회가 처음이신가요?
             </div>
             <Link href="/signup">
               <IconBadge
