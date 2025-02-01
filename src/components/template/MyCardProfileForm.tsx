@@ -2,7 +2,7 @@
 
 import { IoTrashOutline } from 'react-icons/io5';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ProfileImageProps {
   modifyMode: boolean;
@@ -10,6 +10,8 @@ interface ProfileImageProps {
   showNewImage: string;
   setShowNewImage: (showNewImage: string) => void;
   setNewImage: (newImage: File) => void;
+  simpleInfo: { key: string; value: string }[]; // simple_info 추가
+  setSimpleInfo: (simpleInfo: { key: string; value: string }[]) => void;
 }
 
 export default function MyCardProfileForm({
@@ -18,25 +20,35 @@ export default function MyCardProfileForm({
   showNewImage,
   setShowNewImage,
   setNewImage,
+  simpleInfo,
+  setSimpleInfo,
 }: ProfileImageProps) {
-  const [profileFormData, setProfileFormData] = useState([
-    { key: '나이', value: '25' },
-  ]);
+  const [profileFormData, setProfileFormData] = useState<
+    { key: string; value: string }[]
+  >([]);
   const [newProfileFormData, setNewProfileFormData] = useState({
-    key: '새 Key 값',
-    value: '새 Value 값',
+    key: '예시: 나이',
+    value: '46',
   });
   const [formAddMode, setFormAddMode] = useState(false);
 
-  const handleAddFormMode = () => setFormAddMode(true);
+  useEffect(() => {
+    setProfileFormData(simpleInfo);
+  }, [simpleInfo]);
+
+  const handleAddFormMode = () => {
+    setFormAddMode(true);
+  };
+
   const addFormData = () => {
     if (newProfileFormData.key && newProfileFormData.value) {
-      setProfileFormData([...profileFormData, newProfileFormData]);
-      setNewProfileFormData({ key: '새 Key 값', value: '새 Value 값' });
+      const updatedProfileFormData = [...profileFormData, newProfileFormData];
+      setProfileFormData(updatedProfileFormData);
+      setSimpleInfo(updatedProfileFormData);
+      setNewProfileFormData({ key: '예시: 나이', value: '46' });
     }
     setFormAddMode(false);
   };
-
   const deleteProfileFormData = (id: number) => {
     const updatedProfileFormData = [...profileFormData];
     updatedProfileFormData.splice(id, 1);
@@ -138,27 +150,29 @@ export default function MyCardProfileForm({
         </div>
       ) : (
         <div>
-          {profileFormData.map((items, index) => {
-            return (
-              <div className="grid grid-cols-2 gap-2 my-2" key={index}>
-                <div className="text-gray-400 text-center">{items.key}</div>
-                <div className="flex justify-center gap-2">
-                  <div className="text-black text-center">{items.value}</div>
+          {profileFormData.map((items, index) => (
+            <div className="grid grid-cols-2 gap-2 my-2" key={index}>
+              <div className="text-gray-400 text-center">{items.key}</div>
+              <div className="flex justify-center gap-2">
+                <div className="text-black text-center">{items.value}</div>
+                {modifyMode && ( // modifyMode일 때만 삭제 버튼 보이기
                   <button onClick={() => deleteProfileFormData(index)}>
                     <IoTrashOutline className="font-light" />
                   </button>
-                </div>
+                )}
               </div>
-            );
-          })}
-          <div className="px-3 my-3">
-            <button
-              className="w-full bg-ourLightGreen text-gray-400 rounded-lg"
-              onClick={handleAddFormMode}
-            >
-              +
-            </button>
-          </div>
+            </div>
+          ))}
+          {modifyMode && ( // modifyMode일 때만 추가 버튼 보이기
+            <div className="px-3 my-3">
+              <button
+                className="w-full bg-ourLightGreen text-gray-400 rounded-lg"
+                onClick={handleAddFormMode}
+              >
+                +
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
