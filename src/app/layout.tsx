@@ -1,3 +1,4 @@
+import { AuthProvider } from '@/context/AuthContext';
 import { ReactNode } from 'react';
 import './globals.css';
 
@@ -8,9 +9,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>
-        {children}
-        <div id={'modal-root'} />
+      <body className="font-fontRegular">
+        <AuthProvider>
+          {children}
+          <div id={'modal-root'} />
+        </AuthProvider>
       </body>
     </html>
   );
