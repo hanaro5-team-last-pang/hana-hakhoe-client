@@ -1,9 +1,13 @@
-import { getMyAuthData } from '@/app/action';
-import OpenMentoringForm from '@/components/template/OpenMentoringForm';
+'use client';
 
-export default async function Page() {
+import OpenMentoringForm from '@/components/template/OpenMentoringForm';
+import { useAuth } from '@/context/AuthContext';
+
+export default function Page() {
   // TODO: 나중에 전역 관리해야 함
-  const { name } = await getMyAuthData();
+
+  const { name } = useAuth();
+
   return (
     <div>
       <p className="text-2xl font-bold p-3 text-center text-ourGreen">
