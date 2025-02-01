@@ -92,3 +92,9 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.custom-toast {
+  top: 63px;
+  right: 5px;
+  position: fixed;
+}

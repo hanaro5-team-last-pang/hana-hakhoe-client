@@ -1,8 +1,9 @@
 'use client';
 
 // TODO: ag-grid 표 컴포넌트 상태 관리 필요할 시 변경 필요
+import { MentoringTableType } from '@/app/(main)/mypage/type';
 import MentoringListTableStatus from '@/components/organisms/MentoringListTableStatus';
-import { MentoringType } from '@/types/hanaHakdang';
+import { useAuth } from '@/context/AuthContext';
 import {
   ModuleRegistry,
   ColDef,
@@ -14,33 +15,39 @@ import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
 interface Props {
-  mentorings: MentoringType[];
+  mentorings: MentoringTableType[];
 }
 
 export default function MentoringListTable(props: Props) {
   const { mentorings } = props;
+  const { role } = useAuth();
   const router = useRouter();
   ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
   const colDefs: ColDef[] = [
     {
-      field: 'mentoringName',
+      field: 'title',
       headerName: '멘토링명',
       width: 250, // 기본 너비 설정 (px 단위)
       minWidth: 210,
     },
     {
-      field: 'mentoringDate',
+      field: 'start_date',
       headerName: '날짜',
       width: 160, // 기본 너비 설정
       minWidth: 140,
     },
-    {
-      field: 'mentorName',
-      headerName: '강사명',
-      width: 100,
-      minWidth: 70, // 최소 너비 설정
-    },
+    // 멘토일 경우 강사명 컬럼 제거
+    ...(role === 'mentor'
+      ? []
+      : [
+          {
+            field: 'mentorName',
+            headerName: '강사명',
+            width: 100,
+            minWidth: 70,
+          },
+        ]),
     {
       field: 'status',
       headerName: '상태',
@@ -50,8 +57,8 @@ export default function MentoringListTable(props: Props) {
     },
     {
       field: 'review',
-      headerName: '리뷰',
-      width: 100,
+      headerName: role === 'mentor' ? '멘토링 수정하기' : '리뷰', // 역할에 따라 컬럼 헤더 변경
+      width: 140,
       minWidth: 110,
     },
   ];
@@ -63,10 +70,9 @@ export default function MentoringListTable(props: Props) {
     },
     [router]
   );
-
   return (
     <div
-      className={`min-h-[135px] max-h-[500px] w-full overflow-y-auto scrollbar-hide`}
+      className={`min-h-[135px] h-[500px] w-full overflow-y-auto scrollbar-hide`}
     >
       <AgGridReact
         rowData={mentorings}
