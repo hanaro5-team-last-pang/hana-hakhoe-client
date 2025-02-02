@@ -53,26 +53,6 @@ export default function VideoComponent({ classroomId }: Props) {
   const mentorKey = useRef<string | null>(null);
   const [role, setRole] = useState<'mentor' | 'mentee' | null>(null);
 
-  useEffect(() => {
-    if (isConnected && stream) {
-      const storedMentorKey = localStorage.getItem('mentorKey');
-      if (!storedMentorKey) {
-        setRole('mentor');
-        localStorage.setItem('mentorKey', currentKey.current);
-        mentorKey.current = currentKey.current;
-        subscribeEnter();
-      } else {
-        setRole('mentee');
-        mentorKey.current = storedMentorKey;
-        subscribeEnter();
-        publish(ENTER_PUBLISH_URL(classroomId), {
-          type: 'Enter',
-          key: currentKey.current,
-        });
-      }
-    }
-  }, [isConnected, stream]);
-
   const setupIceCandidateHandling = (
     peerConnection: LocalPeerConnection | RemotePeerConnection,
     key: string
@@ -367,6 +347,26 @@ export default function VideoComponent({ classroomId }: Props) {
       ? 'grid-cols-3 grid-rows-3'
       : 'grid-cols-2 grid-rows-2';
   };
+
+  useEffect(() => {
+    if (isConnected && stream) {
+      const storedMentorKey = localStorage.getItem('mentorKey');
+      if (!storedMentorKey) {
+        setRole('mentor');
+        localStorage.setItem('mentorKey', currentKey.current);
+        mentorKey.current = currentKey.current;
+        subscribeEnter();
+      } else {
+        setRole('mentee');
+        mentorKey.current = storedMentorKey;
+        subscribeEnter();
+        publish(ENTER_PUBLISH_URL(classroomId), {
+          type: 'Enter',
+          key: currentKey.current,
+        });
+      }
+    }
+  }, [isConnected, stream]);
 
   return (
     <div className="overflow-y-auto flex flex-col scrollbar-hide">
