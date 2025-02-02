@@ -58,10 +58,23 @@ export default function MentoringListTable(props: Props) {
     },
     {
       field: 'review',
-      headerName: role === 'mentor' ? '멘토링 수정하기' : '리뷰', // 역할에 따라 컬럼 헤더 변경
-      width: 140,
+      headerName: role === 'mentor' ? '멘토링 수정' : '리뷰', // 역할에 따라 컬럼 헤더 변경
+      width: 130,
       minWidth: 110,
     },
+    // 멘토일 때 "멘토링 삭제" 컬럼 추가
+    ...(role === 'mentor'
+      ? [
+          {
+            field: 'delete',
+            headerName: '멘토링 삭제',
+            width: 130,
+            minWidth: 110,
+            cellRenderer: 'buttonRenderer',
+            // deletelecture action 추가
+          },
+        ]
+      : []),
   ];
 
   const handleRowClick = useCallback(

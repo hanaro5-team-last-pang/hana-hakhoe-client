@@ -12,7 +12,7 @@ const DEFAULT_IMAGE_URL = '/img_landing.png';
 
 const LectureToCardData = (lecture: LectureType) => {
   return {
-    id: lecture.lectureId.toString(),
+    id: lecture.lectureId,
     title: lecture.title,
     imageSrc: lecture.thumbnailImgUrl || DEFAULT_IMAGE_URL,
     mentor_name: lecture.mentorName,
@@ -56,11 +56,21 @@ export default async function Page() {
           <div className="w-full">
             <div className="mb-8">
               <div className="text-sm mb-3 font-semibold">멘토링 카테고리</div>
-              <CheckboxList items={category} />
+              {/*<CheckboxList*/}
+              {/*  items={category}*/}
+              {/*  textClassName="text-sm"*/}
+              {/*  selectedTags={selectedCategoryTags}*/}
+              {/*  onChange={handleCategoryChange}*/}
+              {/*/>*/}
             </div>
             <div>
               <div className="text-sm mb-3 font-semibold">연령 카테고리</div>
-              <CheckboxList items={age_category} />
+              {/*<CheckboxList*/}
+              {/*  items={age_category}*/}
+              {/*  textClassName="text-sm"*/}
+              {/*  selectedTags={selectedAgeCategoryTags}*/}
+              {/*  onChange={handleAgeCategoryChange}*/}
+              {/*/>*/}
             </div>
           </div>
         </div>

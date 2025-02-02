@@ -18,7 +18,6 @@ const DEFAULT_IMAGE_URL = '/img_landing.png';
 export default function MentoringIntro(props: Props) {
   const {
     category,
-    tags,
     startTime,
     mentorName,
     duration,
@@ -69,17 +68,7 @@ export default function MentoringIntro(props: Props) {
               <div className="text-white text-2xl mt-4 font-bold">{title}</div>
               <div className="text-lg text-gray-400 my-2">{`${mentorName} 멘토님`}</div>
             </div>
-            <div className="flex items-start my-2">
-              {tags.map((items, index) => {
-                return (
-                  <Badge
-                    text={`#${items}`}
-                    key={index}
-                    className="bg-blue-500 text-white text-sm rounded-lg mr-3"
-                  />
-                );
-              })}
-            </div>
+            <div className="flex items-start my-2"></div>
           </div>
           {/* 오른쪽 div */}
           <div className="flex flex-col items-center rounded-2xl bg-white border border-gray-400 overflow-hidden relative aspect-[4/3]">
