@@ -98,7 +98,10 @@ export async function login(
   prevState: ActionResType<LoginType, string>,
   formData: FormData
 ): Promise<ActionResType<LoginType, string>> {
-  const value = Object.fromEntries(formData) as LoginType;
+  const value: LoginType = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  };
 
   const res = await fetch(`${BASE_URL}/login`, {
     method: 'POST',
@@ -108,11 +111,7 @@ export async function login(
     body: JSON.stringify(value),
   });
 
-  if (!res.ok) {
-    const data = await res.json();
-    console.log(data);
-    return { value: value, message: data, isError: true };
-  }
+  console.log(`Status: ${res.status}`);
 
   const c = res.headers.getSetCookie();
   const cookieStore = await cookies();

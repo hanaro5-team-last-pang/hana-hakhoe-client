@@ -10,13 +10,12 @@ import {
 import { ProfileResponseType } from '@/app/(main)/mypage/type';
 import { BASE_HEADERS, BASE_URL } from '@/constant';
 import { ActionResType, BaseResType } from '@/types/hanaHakdang';
-import { cookies } from 'next/headers';
+import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
 import { notFound } from 'next/navigation';
 
 //전체 멘토링 조회
 export async function getLectureList() {
-  const cookieStore = await cookies();
-  const jsessionIdCookie = cookieStore.get('JSESSIONID');
+  const jsessionIdCookie = await checkAuthAndGetCookie();
 
   const res = await fetch(`${BASE_URL}/lectures`, {
     method: 'GET',
@@ -35,8 +34,7 @@ export async function getLectureList() {
 
 //키워드 검색
 export async function getLectureSearch() {
-  const cookieStore = await cookies();
-  const jsessionIdCookie = cookieStore.get('JSESSIONID');
+  const jsessionIdCookie = await checkAuthAndGetCookie();
 
   const res = await fetch(`${BASE_URL}/search`, {
     method: 'GET',
@@ -55,8 +53,7 @@ export async function getLectureSearch() {
 
 //멘토링 상세 정보
 export async function getLectureData(lectureId: number) {
-  const cookieStore = await cookies();
-  const jsessionIdCookie = cookieStore.get('JSESSIONID');
+  const jsessionIdCookie = await checkAuthAndGetCookie();
 
   const res = await fetch(BASE_URL + `/lectures/${lectureId}`, {
     method: 'GET',
@@ -75,8 +72,8 @@ export async function getLectureData(lectureId: number) {
 
 //멘토링 상세 - 멘토 소개
 export async function getProfileCard(lectureId: number) {
-  const cookieStore = await cookies();
-  const jsessionIdCookie = cookieStore.get('JSESSIONID');
+  const jsessionIdCookie = await checkAuthAndGetCookie();
+
   const res = await fetch(BASE_URL + `/profile-card/${lectureId}`, {
     method: 'GET',
     headers: {
