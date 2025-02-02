@@ -85,7 +85,7 @@ export default function VideoComponent({ classroomId }: Props) {
   const createVideoElement = (id: string) => {
     const videoElement = document.createElement('video');
     videoElement.id = id;
-    videoElement.className = 'rounded-xl aspect-[16/9] object-cover';
+    videoElement.className = 'w-full h-full rounded-xl object-cover';
     videoElement.setAttribute('autoPlay', 'true');
     videoElement.setAttribute('playsInline', 'true');
 
@@ -117,7 +117,9 @@ export default function VideoComponent({ classroomId }: Props) {
       uniqueStr ? uniqueStr : currentKey.current,
       false
     ) as LocalPeerConnection;
-    const mentorVideoElement = createVideoElement('mentor-video');
+    const mentorVideoElement = createVideoElement(
+      uniqueStr ? uniqueStr : currentKey.current
+    );
 
     localPeerConnection.addRemoteTrack(mentorVideoElement);
     pcListMap.set(uniqueStr ? uniqueStr : currentKey.current, {
@@ -140,7 +142,7 @@ export default function VideoComponent({ classroomId }: Props) {
         key,
         true
       ) as RemotePeerConnection;
-      const videoElement = createVideoElement(`video-${key}`);
+      const videoElement = createVideoElement(key);
 
       remotePeerConnection.addRemoteTrack(videoElement);
       pcListMap.set(key, { local: null, remote: remotePeerConnection });
@@ -227,6 +229,9 @@ export default function VideoComponent({ classroomId }: Props) {
           await handleLocalPeer(uuidv4(), remoteId);
         }
         localPeerConnection.setRemoteId = remoteId;
+        if (remoteId === mentorKey.current) {
+          moveToMentorContainer(peerId);
+        }
         await localPeerConnection.receiveAnswerCallback(description);
       }
     });
@@ -244,6 +249,17 @@ export default function VideoComponent({ classroomId }: Props) {
       }
     });
   }, [classroomId, stream]);
+
+  const moveToMentorContainer = (peerId: string) => {
+    const videoElement = document.getElementById(peerId);
+    const mentorContainer = document.getElementById('mentor-video-container');
+
+    if (videoElement && mentorContainer) {
+      mentorContainer.appendChild(videoElement);
+      videoElement.className =
+        'w-full h-full rounded-xl object-cover border-4 border-yellow-500';
+    }
+  };
 
   const startScreenStream = async () => {
     try {
@@ -345,13 +361,36 @@ export default function VideoComponent({ classroomId }: Props) {
     router.push(`/mentorings/${classroomId}`);
   };
 
+  const getGridSize = () => {
+    const peerCount = pcListMap.size; // 현재 연결된 피어 수 계산
+    return peerCount > 3
+      ? 'grid-cols-3 grid-rows-3'
+      : 'grid-cols-2 grid-rows-2';
+  };
+
   return (
     <div className="overflow-y-auto flex flex-col scrollbar-hide">
-      <div className="flex justify-center">
-        <video ref={videoRef} autoPlay />
-      </div>
-      <div id="remote-video-container"></div>
-      <div className="flex justify-center gap-2 my-2">
+      {role === 'mentor' ? (
+        <div
+          id="remote-video-container"
+          className={`grid ${getGridSize()} gap-2 p-2 w-4/5 h-4/5`}
+        ></div>
+      ) : (
+        <>
+          <div id="mentor-video-container" className="p-2 h-3/5 w-4/5"></div>
+          <div
+            id="remote-video-container"
+            className="h-1/5 grid grid-cols-4 p-2 w-4/5"
+          ></div>
+        </>
+      )}
+      <div className="w-full h-1/5"></div>
+      <video
+        ref={videoRef}
+        autoPlay
+        className="rounded-full object-cover absolute right-2 bottom-2 w-28 h-28"
+      />
+      <div className="absolute bottom-0 left-2 flex justify-center gap-2 my-2">
         <Dropdown
           menuButton={
             <span className="rounded-full bg-ourOrange text-white text-sm font-medium px-4 py-2 shadow-md">
