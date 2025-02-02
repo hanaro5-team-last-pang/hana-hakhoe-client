@@ -34,36 +34,6 @@ export default function Page() {
     isError: false,
   });
 
-  // 프로필 데이터 가져오기
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const profile = await getProfile();
-      setProfileData(profile);
-
-      if (profile.short_introduction) {
-        setOneLineIntroduction(profile.short_introduction);
-        setNewOneLineIntroduction(profile.short_introduction);
-      }
-      if (profile.detail_info) {
-        const introductionValue =
-          profile.detail_info[0]?.value || '자신의 소개에 대해 입력하세요';
-        const careerValue =
-          profile.detail_info[1]?.value || '자신의 이력에 대해 입력하세요';
-
-        setNewIntroduction(introductionValue);
-        setIntroduction(introductionValue);
-        setNewCareer(careerValue);
-        setCareer(careerValue);
-      }
-      if (profile.simple_info) {
-        setSimpleInfo(profile.simple_info || []);
-      }
-    };
-    fetchProfile();
-  }, []);
-
-  console.log(profileData);
-
   // 상태 설정
   const [oneLineIntroduction, setOneLineIntroduction] =
     useState<string>('한 줄 소개를 입력하세요');
@@ -117,6 +87,34 @@ export default function Page() {
     setCareer(newCareer);
     setModifyMode(false);
   };
+
+  // 프로필 데이터 가져오기
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const profile = await getProfile();
+      setProfileData(profile);
+
+      if (profile.short_introduction) {
+        setOneLineIntroduction(profile.short_introduction);
+        setNewOneLineIntroduction(profile.short_introduction);
+      }
+      if (profile.detail_info) {
+        const introductionValue =
+          profile.detail_info[0]?.value || '자신의 소개에 대해 입력하세요';
+        const careerValue =
+          profile.detail_info[1]?.value || '자신의 이력에 대해 입력하세요';
+
+        setNewIntroduction(introductionValue);
+        setIntroduction(introductionValue);
+        setNewCareer(careerValue);
+        setCareer(careerValue);
+      }
+      if (profile.simple_info) {
+        setSimpleInfo(profile.simple_info || []);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   return (
     <div className="p-4 relative">
