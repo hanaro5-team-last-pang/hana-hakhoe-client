@@ -1,5 +1,5 @@
-import { getLectureList } from '@/app/(main)/mentorings/actions';
-import { LectureType } from '@/app/(main)/mentorings/type';
+//import { getLectureList } from '@/app/(main)/mentorings/actions';
+//import { LectureType } from '@/app/(main)/mentorings/type';
 import IconButton from '@/components/atoms/IconButton';
 import LinkButton from '@/components/atoms/LinkButton';
 import HeaderTab from '@/components/molecules/HeaderTab';
@@ -8,34 +8,48 @@ import MainPageText from '@/components/molecules/MainpageText';
 import CardView from '@/components/organisms/CardView';
 import Footer from '@/components/organisms/Footer';
 import Header from '@/components/organisms/Header';
-import { iconButtonData, newsData } from '@/utils/dummy';
-import dayjs from 'dayjs';
+import { iconButtonData, newsData, cardData } from '@/utils/dummy';
+//import dayjs from 'dayjs';
 import landing from 'public/img_landing_3.png';
 import banner from 'public/img_main_banner.png';
 import Image from 'next/image';
 
-//TODO: 임시 default image
-const DEFAULT_IMAGE_URL = '/img_landing.png';
-
-const LectureToCardData = (lecture: LectureType) => {
-  return {
-    id: lecture.lectureId.toString(),
-    title: lecture.title,
-    imageSrc: lecture.thumbnailImgUrl || DEFAULT_IMAGE_URL,
-    mentor_name: lecture.mentorName,
-    start_time: dayjs(lecture.startTime).format('YYYY-MM-DD'),
-    duration: lecture.duration,
-    participants: lecture.currParticipants,
-    max_participants: lecture.maxParticipants,
-    category: lecture.category,
-    badgeClassName: 'bg-ourOrange',
-  };
-};
+// //TODO: 임시 default image
+// const DEFAULT_IMAGE_URL = '/img_landing.png';
+//
+// const LectureToCardData = (lecture: LectureType) => {
+//   return {
+//     id: lecture.lectureId.toString(),
+//     title: lecture.title,
+//     imageSrc: lecture.thumbnailImgUrl || DEFAULT_IMAGE_URL,
+//     mentor_name: lecture.mentorName,
+//     start_time: dayjs(lecture.startTime).format('YYYY-MM-DD'),
+//     duration: lecture.duration,
+//     participants: lecture.currParticipants,
+//     max_participants: lecture.maxParticipants,
+//     category: lecture.category,
+//     badgeClassName: 'bg-ourOrange',
+//   };
+// };
 
 export default async function Home() {
-  const result = await getLectureList();
-  const cardData = result.map(LectureToCardData);
+  //TODO 서버 실행시 목데이터가 없어서 에러, 기본 데이터 정해지면 수정
+  /*
+  let result: LectureType[] = [];
 
+  try {
+    result = await getLectureList();
+  } catch (error) {
+    console.error('Error fetching lecture list:', error);
+  }
+
+  const cardDataFromAPI = result.map(LectureToCardData);
+
+  // 카드 데이터가 없을 경우 dummy 데이터 사용
+  const cardDataToDisplay =
+    cardDataFromAPI.length > 0 ? cardDataFromAPI : cardData;
+
+   */
   return (
     <>
       <Header>
