@@ -15,15 +15,13 @@ export default function HeaderTab() {
   const [showTabComponent, setShowTabComponent] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 드롭다운 외부 클릭 감지
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        setShowTabComponent(false); // 드롭다운 닫기
-        console.log(1);
+        setShowTabComponent(false);
       }
     }
 
