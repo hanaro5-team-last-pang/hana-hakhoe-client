@@ -15,9 +15,10 @@ export default function MentoringFAQForm(props: Props) {
   const [faq, setFaq] = useState<FaqResponseType[]>([]);
   const [state, formAction] = useActionState(postFaq, {
     value: {
-      question: '',
+      lectureId,
+      content: '',
     },
-    message: '',
+    message: 'faq 등록',
     isError: false,
   });
 
@@ -43,8 +44,8 @@ export default function MentoringFAQForm(props: Props) {
         <form action={formAction} className="flex flex-col items-start gap-y-1">
           <textarea
             placeholder="질문을 입력하세요"
-            name="question"
-            defaultValue={state.value.question}
+            name="content"
+            defaultValue={state.value.content}
             className="border border-gray-300 rounded-md w-full p-2"
             rows={3}
           />

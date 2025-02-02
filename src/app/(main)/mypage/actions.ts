@@ -66,27 +66,48 @@ export async function ModifyProfile(
 
 // 멘토링 등록
 export async function openMentoring(
-  prevState: ActionResType<openMentoringFormType, string>,
   formData: FormData
 ): Promise<ActionResType<openMentoringFormType, string>> {
   const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const value: openMentoringFormType = {
-    imageFile: formData.get('imageFile') as string,
-    data: {
-      title: formData.get('title') as string,
-      description: formData.get('description') as string,
-      start_time: new Date(
-        `${formData.get('date')}T${formData.get('start_time')}:00`
-      ).toISOString(),
-      end_time: new Date(
-        `${formData.get('date')}T${formData.get('end_time')}:00`
-      ).toISOString(),
-      max_participants: Number(formData.get('max_participants')),
-      category: formData.get('category') as string,
-      tags: Array.from(formData.getAll('tags[]')).map((tag) => tag as string),
-    },
+  const data = {
+    title: formData.get('title') as string,
+    description: formData.get('description') as string,
+    startTime: formData.get('start_time') as string,
+    endTime: formData.get('end_time') as string,
+    maxParticipants: Number(formData.get('max_participants')),
+    category: formData.get('category') as string,
+    tags: formData.getAll('tags').map(Number),
   };
+
+  const formDataForSubmission = new FormData();
+  formDataForSubmission.append('imageFile', formData.get('imageFile') as File);
+  formDataForSubmission.append(
+    'data',
+    new Blob([JSON.stringify(data)], { type: 'application/json' })
+  );
+
+  console.log('🚀 Sending FormData:', formDataForSubmission);
+
+  const res = await fetch(`${BASE_URL}/lectures/register`, {
+    method: 'POST',
+    headers: {
+      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
+    },
+    body: formDataForSubmission,
+  });
+
+
+  const responseData = await res.json();
+
+  if (res.ok && res.status === 200) {
+    console.log(responseData);
+    redirect('/mypage/mentorings');
+  } else {
+    console.log('Error:', responseData.message || '등록 실패');
+  }
+
+  redirect('/mypage/mentorings');
 
   console.log(value);
   const res = await fetcher('POST', '/lectures/register', {

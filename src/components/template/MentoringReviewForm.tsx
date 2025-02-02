@@ -20,7 +20,7 @@ export default function MentoringReviewForm(props: Props) {
   useEffect(() => {
     const loadReviewResponse = async () => {
       const reviewRes = await getLectureReviews(lectureId);
-      setReviewRes(reviewRes);
+      setReviewRes(reviewRes.result);
     };
     loadReviewResponse().then();
   }, []);
@@ -32,9 +32,7 @@ export default function MentoringReviewForm(props: Props) {
   return (
     <div className="p-10 w-full">
       <div className="flex items-center gap-3">
-        <h2 className="text-3xl font-bold mb-4">
-          {reviewRes.averageScore.toFixed(1)}
-        </h2>
+        <h2 className="text-3xl font-bold mb-4">{reviewRes.averageScore}</h2>
         <div className="flex flex-col items-start mb-4">
           <div className="flex mb-1">
             {Array.from({ length: 5 }, (_, index) => (
@@ -64,7 +62,11 @@ export default function MentoringReviewForm(props: Props) {
               ))}
             </div>
             <span className="w-10 mr-2">
-              {((subScore.count / reviewRes.count) * 100).toFixed(1)}%
+              {(isNaN(subScore.count / reviewRes.count)
+                ? 0
+                : (subScore.count / reviewRes.count) * 100
+              ).toFixed(1)}
+              %
             </span>
             <div className="flex-1 bg-gray-300 rounded-full h-2 relative">
               <div

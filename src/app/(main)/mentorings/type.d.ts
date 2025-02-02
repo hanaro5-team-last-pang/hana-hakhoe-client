@@ -2,11 +2,9 @@ export type LectureType = {
   lectureId: number;
   mentorName: string;
   category: string;
-  tags: string[];
   title: string;
   description: string;
   startTime: string;
-  endTime: string;
   duration: number;
   currParticipants: number;
   maxParticipants: number;
@@ -62,5 +60,6 @@ export type FaqResponseType = {
 };
 
 export type FaqFormType = {
-  question: string;
+  lectureId: number;
+  content: string;
 };

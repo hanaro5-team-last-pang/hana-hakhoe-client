@@ -2,7 +2,7 @@ import { getNewsData } from '@/app/(main)/news/action';
 import CheckboxList from '@/components/molecules/CheckboxList';
 import CardView from '@/components/organisms/CardView';
 import SearchBar from '@/components/template/SearchBar';
-import { category } from '@/utils/dummy';
+import { category, age_category } from '@/utils/dummy';
 import dayjs from 'dayjs';
 
 export default async function Page() {
@@ -21,11 +21,11 @@ export default async function Page() {
               {newsData.map((card) => (
                 <CardView
                   key={card.id}
-                  {...card}
+                  id={card.newsUrl}
                   imageSrc={card.newsThumbnailUrl}
+                  title={card.title}
                   description={card.content}
                   date={dayjs(card.createdAt).format('YYYY년 MM월 DD일')}
-                  id={card.newsUrl}
                 />
               ))}
             </div>
@@ -35,7 +35,21 @@ export default async function Page() {
           <div className="w-full">
             <div className="mb-8">
               <div className="text-sm mb-3 font-semibold"> 카테고리</div>
-              <CheckboxList items={category} />
+              {/*<CheckboxList*/}
+              {/*  items={category}*/}
+              {/*  textClassName="text-sm"*/}
+              {/*  selectedTags={selectedCategoryTags}*/}
+              {/*  onChange={handleCategoryChange}*/}
+              {/*/>*/}
+            </div>
+            <div>
+              <div className="text-sm mb-3 font-semibold">연령 카테고리</div>
+              {/*<CheckboxList*/}
+              {/*  items={age_category}*/}
+              {/*  textClassName="text-sm"*/}
+              {/*  selectedTags={selectedAgeCategoryTags}*/}
+              {/*  onChange={handleAgeCategoryChange}*/}
+              {/*/>*/}
             </div>
           </div>
         </div>

@@ -23,15 +23,15 @@ export type MentoringTableType = {
 };
 
 export type openMentoringFormType = {
-  imageFile: string | null;
+  imageFile: File;
   data: {
     title: string;
     description: string;
-    start_time: string;
-    end_time: string;
-    max_participants: number;
+    startTime: Date;
+    endTime: Date;
+    maxParticipants: number;
     category: string;
-    tags: string[];
+    tags: number[];
   };
 };
 
