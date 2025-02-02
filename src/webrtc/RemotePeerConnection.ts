@@ -38,7 +38,7 @@ export default class RemotePeerConnection {
     localPeerId: string
   ) {
     if (!this._pConn) {
-      throw new Error('로컬 연결을 찾을 수 없습니다.');
+      throw new Error('원격 연결을 찾을 수 없습니다.');
     }
     this._pConn.addEventListener('icecandidate', (e) => {
       if (e.candidate) {
@@ -88,7 +88,7 @@ export default class RemotePeerConnection {
           await Promise.race([
             videoElement.play(),
             new Promise((_, reject) =>
-              setTimeout(() => reject(new Error('play error')), 8000)
+              setTimeout(() => reject(new Error('play error')), 5000)
             ),
           ]);
         } catch {
