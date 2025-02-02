@@ -6,13 +6,14 @@ import { MdOutlineAccountBox } from 'react-icons/md';
 import { PiShoppingBagOpen } from 'react-icons/pi';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function HeaderTab() {
   const loginUserRole = 'mentor'; // 로그인 상태 관리는 전역 상태 관리로 이루어질 예정
   const router = useRouter();
   const currentLocation = usePathname();
   const [showTabComponent, setShowTabComponent] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleShowComponent = () => {
     setShowTabComponent((prev) => {
@@ -88,12 +89,25 @@ export default function HeaderTab() {
           )}
         </div>
       ),
+      tabComponentRef: dropdownRef,
     },
   ];
 
-  return (
-    <div>
-      <Tab tabList={tabList} />
-    </div>
-  );
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowTabComponent(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  return <Tab tabList={tabList} />;
 }

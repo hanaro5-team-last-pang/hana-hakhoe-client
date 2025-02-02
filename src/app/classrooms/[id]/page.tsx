@@ -1,6 +1,5 @@
 import ChatComponent from '@/app/classrooms/_component/ChatComponent';
 import VideoComponent from '@/app/classrooms/_component/VideoComponent';
-import StompConnectionProvider from '@/provider/StompConnectionProvider';
 import { IoChevronBackSharp } from 'react-icons/io5';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -44,8 +43,7 @@ export default async function Page(props: { params: Params }) {
           </Link>
           <div className="font-bold ">{classroomTitle}</div>
         </div>
-        <Link href={`/classrooms/${classroomId}/review`}>모달 폼 불러오기</Link>
-        <VideoComponent />
+        <VideoComponent classroomId={classroomId} />
       </div>
       <div className="p-4 hidden lg:block relative overflow-y-auto">
         <ChatComponent classroomId={classroomId} />

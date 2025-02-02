@@ -6,13 +6,14 @@ import {
   TabPanels,
 } from '@headlessui/react';
 import clsx from 'clsx';
-import { JSX } from 'react';
+import { JSX, Ref } from 'react';
 
 interface tabListProps {
   tabTitle: string;
   tabComponent?: JSX.Element;
   tabListClassName?: string;
   tabOnClickEvent?: () => void;
+  tabComponentRef?: Ref<HTMLElement>;
 }
 
 interface TabProps {
@@ -27,15 +28,19 @@ export default function Tab({
   tabPanelClassName,
 }: TabProps) {
   return (
-    <TabGroup>
-      <TabList>
-        <div className="flex items-center">
+    <TabGroup className="h-full">
+      <TabList className="h-full">
+        <div className="flex items-center h-full">
           {tabList.map((item, index) => {
             return (
               <HeadlessTab
                 key={index}
-                className={clsx('py-5 font-semibold', item.tabListClassName)}
+                className={clsx(
+                  'h-full font-semibold focus:outline-none',
+                  item.tabListClassName
+                )}
                 onClick={item.tabOnClickEvent}
+                ref={item.tabComponentRef}
               >
                 {item.tabTitle}
                 <div className="absolute font-normal mt-4">
