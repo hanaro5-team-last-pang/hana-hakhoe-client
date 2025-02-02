@@ -8,7 +8,7 @@ import {
   AuthType,
   ChangeProfileFormType,
 } from '@/types/hanaHakdang';
-import { cookies } from 'next/headers';
+import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
 
 //검색 서버액션 예시
 export async function handleSearchAction(formData: FormData) {
@@ -45,8 +45,7 @@ export async function submitReview(
 }
 
 export async function getMyAuthData(): Promise<AuthType> {
-  const cookieStore = await cookies();
-  const jsessionIdCookie = cookieStore.get('JSESSIONID');
+  const jsessionIdCookie = await checkAuthAndGetCookie();
 
   const res = await fetch(`${BASE_URL}/user-info`, {
     method: 'GET',
