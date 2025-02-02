@@ -13,7 +13,6 @@ export default function RootLayout({
     <html lang="ko">
       <body className="font-fontRegular">
         <AuthProvider>
-          {' '}
           {children}
           <ToastContainer className="custom-toast" autoClose={3000} />
           <div id={'modal-root'} />
