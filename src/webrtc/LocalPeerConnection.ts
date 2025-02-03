@@ -64,7 +64,9 @@ export default class LocalPeerConnection {
     if (!this._pConn) {
       throw new Error('원격 연결을 찾을 수 없습니다.');
     }
-    await this._pConn.addIceCandidate(candidate);
+    if (this._pConn.remoteDescription) {
+      await this._pConn.addIceCandidate(candidate);
+    }
   }
 
   public addLocalTrack(localStream: MediaStream) {
