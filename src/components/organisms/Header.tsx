@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function Header({ children }: Props) {
-  const { auth, loading } = useAuthStore((state) => state);
+  const { auth, loading, fetchAuth } = useAuthStore((state) => state);
   const items = ['start', 'modify', 'start'];
 
   const loginStatus = !!auth;
@@ -47,7 +47,7 @@ export default function Header({ children }: Props) {
                   lectureTitle="주식 투자 성공기"
                   lectureTime="2024-01-10 15:00"
                 />
-                <ProfileDropdown authData={auth} />
+                <ProfileDropdown authData={auth} fetchAuth={fetchAuth} />
               </div>
             ) : (
               <LinkButton

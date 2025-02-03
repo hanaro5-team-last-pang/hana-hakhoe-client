@@ -14,7 +14,7 @@ export type AuthType = {
   userId: number;
   name: string;
   role: string;
-  profileImage?: string;
+  profileImage: string;
 };
 
 export type ChatResponseType = {
@@ -38,11 +38,20 @@ export type ReducerAction<T> = {
 
 export type ChangeProfileFormType = {
   newImage: File | null;
-  newUserName: string;
-  newBirthDate: string;
-  currentPassword: string;
-  newPassword: string;
-  newConfirmedPassword: string;
+  currentPassword: string | null;
+  newPassword: string | null;
+  newConfirmedPassword: string | null;
+};
+
+export type ChangeProfileRequestType = {
+  imageFile: File | null;
+  accountData?: PasswordChangeRequestType;
+};
+
+export type PasswordChangeRequestType = {
+  currentPassword: string | null;
+  newPassword: string | null;
+  confirmPassword: string | null;
 };
 
 export type SubmitReviewFormType = {

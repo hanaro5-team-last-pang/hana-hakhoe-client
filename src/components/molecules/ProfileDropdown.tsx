@@ -5,23 +5,26 @@ import Dropdown from '@/components/atoms/Dropdown';
 import { AuthType } from '@/types/hanaHakdang';
 import { HiOutlineUserCircle } from 'react-icons/hi2';
 import { PiShoppingBagOpen, PiUser, PiArrowSquareOut } from 'react-icons/pi';
+import Image from 'next/image';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-
-function deleteCookie(name: string) {
-  document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
-  console.log(`${name} 쿠키가 삭제되었습니다.`);
-  redirect('/login');
-}
+import { useCallback } from 'react';
 
 interface Props {
   authData: AuthType;
+  fetchAuth: () => void;
 }
 
-export default function ProfileDropdown(props: Props) {
-  const { name, role, profileImage } = props.authData;
+export default function ProfileDropdown({ authData, fetchAuth }: Props) {
+  const { name, role, profileImage } = authData;
   //TODO: 임시 이미지 설정, userImage 받아 와야함
-  const userImage = 'https://placehold.co/40x40/orange/white';
+
+  const logOut = useCallback(async () => {
+    await fetch('/api/logout', {
+      method: 'POST',
+    });
+    fetchAuth();
+    location.reload();
+  }, []);
 
   const menuItems = [
     <div>
@@ -52,11 +55,7 @@ export default function ProfileDropdown(props: Props) {
       </div>
       <div className="text-xs px-2">마이 페이지</div>
     </Link>,
-    <Button
-      className="flex my-2 items-center"
-      type="button"
-      onClick={() => deleteCookie('JSESSIONID')}
-    >
+    <Button className="flex my-2 items-center" type="button" onClick={logOut}>
       <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
         <PiArrowSquareOut />
       </div>
@@ -67,11 +66,14 @@ export default function ProfileDropdown(props: Props) {
   return (
     <Dropdown
       menuButton={
-        <img
-          className="w-full h-full rounded-full"
-          src={profileImage ?? userImage}
-          alt="Profile Image"
-        />
+        <div className="relative h-10 w-10 rounded-full">
+          <Image
+            style={{ borderRadius: '100%' }}
+            fill
+            src={profileImage}
+            alt="Profile Image"
+          />
+        </div>
       }
       menuItems={menuItems}
       anchor={'bottom start'}

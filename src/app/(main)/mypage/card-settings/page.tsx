@@ -9,6 +9,7 @@ import Button from '@/components/atoms/Button';
 import MyCardCareerForm from '@/components/template/MyCardCareerForm';
 import MyCardIntroductionForm from '@/components/template/MyCardIntroductionForm';
 import MyCardProfileForm from '@/components/template/MyCardProfileForm';
+import { DEFAULT_PROFILE_URL } from '@/constant';
 import { useAuthStore } from '@/context/AuthContext';
 import { FaQuoteLeft, FaQuoteRight } from 'react-icons/fa6';
 import { RiPencilFill } from 'react-icons/ri';
@@ -18,7 +19,7 @@ import { startTransition, useActionState, useEffect, useState } from 'react';
 export default function Page() {
   const { auth, loading } = useAuthStore((state) => state);
   const mentoName = auth ? auth.name : '';
-  const userImage = 'https://placehold.co/25x25';
+  const userImage = auth ? auth.profileImage : DEFAULT_PROFILE_URL;
   const [modifyMode, setModifyMode] = useState(false);
   const [profileData, setProfileData] = useState<ProfileResponseType | null>(
     null

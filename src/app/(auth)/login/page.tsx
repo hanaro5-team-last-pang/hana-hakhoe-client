@@ -7,15 +7,16 @@ import IconBadge from '@/components/atoms/IconBadge';
 import Input from '@/components/atoms/Input';
 import { AiFillEye } from 'react-icons/ai';
 import { MdArrowOutward } from 'react-icons/md';
+import { toast } from 'react-toastify';
 import Link from 'next/link';
-import { useActionState, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 
 export default function Page() {
   const [hide, setHide] = useState(false);
   const [rememberId, setRememberId] = useState(false);
   const [state, formAction] = useActionState(login, {
     value: { email: '', password: '' },
-    message: '로그인 안됨',
+    message: '',
     isError: false,
   });
 
@@ -26,6 +27,12 @@ export default function Page() {
       return newHide;
     });
   };
+
+  useEffect(() => {
+    if (state.isError && state.message) {
+      toast.warning(state.message);
+    }
+  }, [state]);
 
   return (
     <form action={formAction}>

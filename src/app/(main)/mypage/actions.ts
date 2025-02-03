@@ -68,11 +68,9 @@ export async function ModifyProfile(
   });
 
   const data = await res.json();
-
   if (!res.ok) {
     console.log(data.message);
   }
-
   return data.message;
 }
 

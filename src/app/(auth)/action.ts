@@ -1,6 +1,7 @@
 'use server';
 
 import { BASE_URL } from '@/constant';
+import { BaseResType } from '@/types/hanaHakdang';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import {
@@ -111,7 +112,13 @@ export async function login(
     body: JSON.stringify(value),
   });
 
-  console.log(`Status: ${res.status}`);
+  if (!res.ok) {
+    return {
+      value: value,
+      message: '이메일 또는 비밀번호가 일치하지 않습니다.',
+      isError: true,
+    } as ActionResType<LoginType, string>;
+  }
 
   const c = res.headers.getSetCookie();
   const cookieStore = await cookies();

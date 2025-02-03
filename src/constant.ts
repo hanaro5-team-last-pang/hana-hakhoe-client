@@ -6,6 +6,8 @@ export const BASE_HEADERS: HeadersInit = {
   'Content-type': 'application/json',
 };
 
+export const DEFAULT_PROFILE_URL = 'https://placehold.co/40x40/orange/white';
+
 export const STOMP_BROKER_URL = 'ws://ws.hanahakhoe.shop/classroom';
 // export const STOMP_BROKER_URL = 'ws://localhost:8081/classroom';
 

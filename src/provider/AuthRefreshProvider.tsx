@@ -7,12 +7,13 @@ import { ReactNode, useEffect } from 'react';
 interface Props {
   children: ReactNode;
 }
+
 export default function AuthRefreshProvider({ children }: Props) {
   const pathname = usePathname();
-  const fetchAuth = useAuthStore((state) => state.fetchAuth);
+  const { auth, fetchAuth } = useAuthStore((state) => state);
 
   useEffect(() => {
-    if (pathname === '/') {
+    if (!auth) {
       fetchAuth();
     }
   }, [pathname]);

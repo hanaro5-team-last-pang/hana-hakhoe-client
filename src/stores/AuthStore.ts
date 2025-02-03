@@ -1,5 +1,14 @@
+import { DEFAULT_PROFILE_URL } from '@/constant';
 import { AuthType } from '@/types/hanaHakdang';
 import { createStore } from 'zustand/vanilla';
+
+type AuthResType = {
+  userId: number;
+  name: string;
+  role: string;
+  profileImageUrl?: string;
+  birth?: string;
+};
 
 export type AuthState = {
   auth: AuthType | null;
@@ -27,8 +36,13 @@ export const createAuthStore = (initState: AuthState = defaultInitState) => {
         const res = await fetch('/api/user-info', {
           method: 'GET',
         });
-        const data = (await res.json()) as AuthType;
-        set({ auth: data });
+        const data = (await res.json()) as AuthResType;
+        set({
+          auth: {
+            ...data,
+            profileImage: data.profileImageUrl ?? DEFAULT_PROFILE_URL,
+          },
+        });
       } catch (error) {
         console.log(error);
         return;
