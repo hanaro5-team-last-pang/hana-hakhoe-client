@@ -55,7 +55,9 @@ export default class RemotePeerConnection {
     if (!this._pConn) {
       throw new Error('원격 연결을 찾을 수 없습니다.');
     }
-    await this._pConn.addIceCandidate(candidate);
+    if (this._pConn.remoteDescription) {
+      await this._pConn.addIceCandidate(candidate);
+    }
   }
 
   public async receiveOfferCallback(
@@ -88,7 +90,7 @@ export default class RemotePeerConnection {
           await Promise.race([
             videoElement.play(),
             new Promise((_, reject) =>
-              setTimeout(() => reject(new Error('play error')), 5000)
+              setTimeout(() => reject(new Error('play error')), 8000)
             ),
           ]);
         } catch {
