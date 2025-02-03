@@ -137,7 +137,7 @@ export default function Page() {
         <Button
           type="submit"
           text="제출"
-          className="w-full h-full bg-hanaGreen80 px-4 py-2 rounded-xl flex justify-center items-center gap-2 transition text-white"
+          className="w-full h-full bg-ourGreen px-4 py-2 rounded-xl flex justify-center items-center gap-2 transition text-white"
         />
       </div>
     </form>
