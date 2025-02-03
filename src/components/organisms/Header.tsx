@@ -53,7 +53,7 @@ export default function Header({ children }: Props) {
               <LinkButton
                 label="로그인"
                 route="/login"
-                className="bg-hanaGreen80 rounded-2xl text-white text-sm"
+                className="bg-ourGreen rounded-2xl text-white text-sm"
               />
             )}
           </div>

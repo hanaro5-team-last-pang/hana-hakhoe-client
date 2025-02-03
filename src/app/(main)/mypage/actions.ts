@@ -97,7 +97,6 @@ export async function openMentoring(
     body: formDataForSubmission,
   });
 
-
   const responseData = await res.json();
 
   if (res.ok && res.status === 200) {

@@ -1,11 +1,9 @@
 'use server';
 
-import { BASE_HEADERS } from '@/constant';
+import { BASE_HEADERS, BASE_URL } from '@/constant';
 import { BaseResType } from '@/types/hanaHakdang';
 import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
 import { notFound } from 'next/navigation';
-
-const BASE_URL = process.env.BASE_URL;
 
 /**
  * 멘티의 수강신청을 위한 action
