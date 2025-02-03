@@ -2,7 +2,7 @@
 
 import Button from '@/components/atoms/Button';
 import Dropdown from '@/components/atoms/Dropdown';
-import { useAuth } from '@/context/AuthContext';
+import { AuthType } from '@/types/hanaHakdang';
 import { HiOutlineUserCircle } from 'react-icons/hi2';
 import { PiShoppingBagOpen, PiUser, PiArrowSquareOut } from 'react-icons/pi';
 import Link from 'next/link';
@@ -14,8 +14,12 @@ function deleteCookie(name: string) {
   redirect('/login');
 }
 
-export default function ProfileDropdown() {
-  const { role, name } = useAuth();
+interface Props {
+  authData: AuthType;
+}
+
+export default function ProfileDropdown(props: Props) {
+  const { name, role, profileImage } = props.authData;
   //TODO: 임시 이미지 설정, userImage 받아 와야함
   const userImage = 'https://placehold.co/40x40/orange/white';
 
@@ -65,7 +69,7 @@ export default function ProfileDropdown() {
       menuButton={
         <img
           className="w-full h-full rounded-full"
-          src={userImage}
+          src={profileImage ?? userImage}
           alt="Profile Image"
         />
       }

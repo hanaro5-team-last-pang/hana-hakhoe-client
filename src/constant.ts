@@ -1,13 +1,15 @@
-export const BASE_URL = 'http://localhost:8080';
-//export const BASE_URL =
-//  'http://ec2-54-180-148-79.ap-northeast-2.compute.amazonaws.com';
+// export const BASE_URL = 'http://localhost:8080';
+export const BASE_URL =
+  'http://ec2-54-180-148-79.ap-northeast-2.compute.amazonaws.com';
 
 export const BASE_HEADERS: HeadersInit = {
   'Content-type': 'application/json',
 };
 
-// export const STOMP_BROKER_URL = 'ws://ws.hanahakhoe.shop/classroom';
-export const STOMP_BROKER_URL = 'ws://localhost:8081/classroom';
+export const STOMP_BROKER_URL = 'ws://ws.hanahakhoe.shop/classroom';
+// export const STOMP_BROKER_URL = 'ws://localhost:8081/classroom';
+
+export const SESSION_COOKIE_NAME = 'JSESSIONID';
 
 export const CHAT_SUBSCRIBE_URL = (classroomId: bigint) =>
   `/topic/chat/${classroomId}`;

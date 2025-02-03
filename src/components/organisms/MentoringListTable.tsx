@@ -3,7 +3,7 @@
 // TODO: ag-grid 표 컴포넌트 상태 관리 필요할 시 변경 필요
 import { MentoringTableType } from '@/app/(main)/mypage/type';
 import MentoringListTableStatus from '@/components/organisms/MentoringListTableStatus';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/context/AuthContext';
 import {
   ModuleRegistry,
   ColDef,
@@ -20,7 +20,8 @@ interface Props {
 
 export default function MentoringListTable(props: Props) {
   const { mentorings } = props;
-  const { role } = useAuth();
+  const auth = useAuthStore((state) => state.auth);
+  const role = auth ? auth.role : '';
   const router = useRouter();
   ModuleRegistry.registerModules([ClientSideRowModelModule]);
 

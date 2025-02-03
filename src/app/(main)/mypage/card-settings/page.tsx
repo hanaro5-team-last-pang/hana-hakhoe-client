@@ -9,21 +9,20 @@ import Button from '@/components/atoms/Button';
 import MyCardCareerForm from '@/components/template/MyCardCareerForm';
 import MyCardIntroductionForm from '@/components/template/MyCardIntroductionForm';
 import MyCardProfileForm from '@/components/template/MyCardProfileForm';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/context/AuthContext';
 import { FaQuoteLeft, FaQuoteRight } from 'react-icons/fa6';
 import { RiPencilFill } from 'react-icons/ri';
 import { toast } from 'react-toastify';
 import { startTransition, useActionState, useEffect, useState } from 'react';
 
 export default function Page() {
-  const { name } = useAuth();
-  const loginUser = name;
+  const { auth, loading } = useAuthStore((state) => state);
+  const mentoName = auth ? auth.name : '';
   const userImage = 'https://placehold.co/25x25';
   const [modifyMode, setModifyMode] = useState(false);
   const [profileData, setProfileData] = useState<ProfileResponseType | null>(
     null
   );
-
   const [, formAction] = useActionState(ModifyProfile, {
     value: {
       shortIntroduction: '',
@@ -143,7 +142,14 @@ export default function Page() {
         </div>
       )}
       <div className="text-center text-2xl font-bold text-ourGreen">
-        {loginUser} 멘토
+        {loading ? (
+          <div className="animate-pulse">
+            <div className=" h-8 w-10bg-gray-200"></div>
+          </div>
+        ) : (
+          mentoName
+        )}{' '}
+        멘토
       </div>
       <div className="my-10 mx-5 flex justify-center items-center">
         <div className="text-3xl text-ourGreen">
