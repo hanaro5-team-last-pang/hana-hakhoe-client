@@ -124,3 +124,17 @@ export async function deleteFaq(
 /**
  * FAQ에 대한 답변 등록, 삭제 api
  */
+
+/**
+ * category 리스트 가져오기
+ */
+export async function getCategory() {
+  const res = await fetcher('GET', '/lectures/categories');
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    return data.message;
+  }
+  return data.result;
+}

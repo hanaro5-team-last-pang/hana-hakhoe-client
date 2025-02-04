@@ -1,7 +1,6 @@
 'use server';
 
 import {
-  openMentoringFormType,
   MentoringResponseType,
   ProfileRequestType,
   ProfileResponseType,
@@ -10,7 +9,6 @@ import {
 import { ActionResType, BaseResType } from '@/types/hanaHakdang';
 import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
 import { fetcher } from '@/utils/fetcher';
-import { redirect } from 'next/navigation';
 
 /**
  * 멘토의 멘토링 리스트 조회
@@ -67,7 +65,7 @@ export async function ModifyProfile(
  */
 export async function openMentoring(
   formData: FormData
-): Promise<ActionResType<openMentoringFormType, string>> {
+): Promise<ActionResType<string, string>> {
   const accessJwtCookie = await checkAuthAndGetCookie();
 
   const data = {
@@ -86,25 +84,29 @@ export async function openMentoring(
     'data',
     new Blob([JSON.stringify(data)], { type: 'application/json' })
   );
-
+  console.log(data);
   console.log('🚀 Sending FormData:', formDataForSubmission);
 
   const res = await fetcher('POST', '/lectures/register', {
     jwt: accessJwtCookie.value,
-    body: JSON.stringify(formDataForSubmission),
+    body: formDataForSubmission,
     header: {},
   });
 
-  const responseData = await res.json();
+  const responseData = (await res.json()) as BaseResType<null>;
 
-  if (res.ok && res.status === 200) {
-    console.log(responseData);
-    redirect('/mypage/mentorings');
-  } else {
-    console.log('Error:', responseData.message || '등록 실패');
+  if (!res.ok) {
+    return {
+      value: '',
+      message: responseData.message,
+      isError: true,
+    };
   }
-
-  redirect('/mypage/mentorings');
+  return {
+    value: '',
+    message: responseData.message,
+    isError: false,
+  };
 }
 
 /**
