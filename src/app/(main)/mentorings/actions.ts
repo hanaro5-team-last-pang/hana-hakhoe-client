@@ -8,20 +8,17 @@ import {
   ReviewPageResponseType,
 } from '@/app/(main)/mentorings/type';
 import { ProfileResponseType } from '@/app/(main)/mypage/type';
-import { BASE_HEADERS, BASE_URL } from '@/constant';
 import { ActionResType, BaseResType } from '@/types/hanaHakdang';
 import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
+import { fetcher } from '@/utils/fetcher';
 import { notFound } from 'next/navigation';
 
 //전체 멘토링 조회
 export async function getLectureList() {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
+  const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const res = await fetch(`${BASE_URL}/lectures`, {
-    method: 'GET',
-    headers: {
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
+  const res = await fetcher('GET', '/lectures', {
+    jwt: accessJwtCookie.value,
   });
 
   if (!res.ok) {
@@ -34,13 +31,10 @@ export async function getLectureList() {
 
 //키워드 검색
 export async function getLectureSearch() {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
+  const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const res = await fetch(`${BASE_URL}/search`, {
-    method: 'GET',
-    headers: {
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
+  const res = await fetcher('GET', '/search', {
+    jwt: accessJwtCookie.value,
   });
 
   if (!res.ok) {
@@ -53,13 +47,10 @@ export async function getLectureSearch() {
 
 //멘토링 상세 정보
 export async function getLectureData(lectureId: number) {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
+  const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const res = await fetch(BASE_URL + `/lectures/${lectureId}`, {
-    method: 'GET',
-    headers: {
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
+  const res = await fetcher('GET', `/lectures/${lectureId}`, {
+    jwt: accessJwtCookie.value,
   });
 
   if (!res.ok) {
@@ -72,13 +63,10 @@ export async function getLectureData(lectureId: number) {
 
 //멘토링 상세 - 멘토 소개
 export async function getProfileCard(lectureId: number) {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
+  const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const res = await fetch(BASE_URL + `/profile-card/${lectureId}`, {
-    method: 'GET',
-    headers: {
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
+  const res = await fetcher('GET', `/profile-card/${lectureId}`, {
+    jwt: accessJwtCookie.name,
   });
 
   if (!res.ok) {
@@ -141,9 +129,7 @@ export async function getLectureReviews(lectureId: number) {
     ],
   };
 
-  const res = await fetch(BASE_URL + `/review/lectures/${lectureId}`, {
-    headers: BASE_HEADERS,
-  });
+  const res = await fetcher('GET', `/review/lectures/${lectureId}`);
 
   if (!res.ok) {
     notFound();
@@ -219,7 +205,7 @@ export async function getLectureFaqs(lectureId: number) {
   ];
   return dummy;
 
-  const res = await fetch(BASE_URL + `/faq/${lectureId}`);
+  const res = await fetcher('GET', `/faq/${lectureId}`);
 
   if (!res.ok) {
     notFound();

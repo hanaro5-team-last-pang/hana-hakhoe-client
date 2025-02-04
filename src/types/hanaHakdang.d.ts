@@ -71,3 +71,7 @@ export type AccountType = {
   birth: string;
   profileImage: string;
 };
+
+export type Jwt = {
+  accessToken: string;
+};

@@ -1,15 +1,14 @@
 'use server';
 
-import { BASE_HEADERS, BASE_URL } from '@/constant';
 import {
   ActionResType,
   BaseResType,
   SubmitReviewFormType,
   AuthType,
   ChangeProfileFormType,
-  ChangeProfileRequestType,
 } from '@/types/hanaHakdang';
 import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
+import { fetcher } from '@/utils/fetcher';
 
 //검색 서버액션 예시
 export async function handleSearchAction(formData: FormData) {
@@ -21,7 +20,7 @@ export async function changeProfileForm(
   prevState: ActionResType<ChangeProfileFormType, string>,
   formData: FormData
 ): Promise<ActionResType<ChangeProfileFormType, string>> {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
+  const accessJwtCookie = await checkAuthAndGetCookie();
   const formObj: ChangeProfileFormType = {
     newImage: formData.get('profile-image-upload') as File | null,
     currentPassword: formData.get('currentPassword') as string | null,
@@ -53,12 +52,9 @@ export async function changeProfileForm(
     );
   }
 
-  const res = await fetch(BASE_URL + '/account', {
-    method: 'PATCH',
-    headers: {
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
+  const res = await fetcher('PATCH', '/account', {
     body: reqFormData,
+    jwt: accessJwtCookie.value,
   });
 
   if (!res.ok) {
@@ -96,14 +92,10 @@ export async function submitReview(
 }
 
 export async function getMyAuthData(): Promise<AuthType> {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
+  const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const res = await fetch(`${BASE_URL}/user-info`, {
-    method: 'GET',
-    headers: {
-      ...BASE_HEADERS,
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
+  const res = await fetcher('GET', '/user-info', {
+    jwt: accessJwtCookie.value,
   });
 
   const data = (await res.json()) as BaseResType<AuthType>;

@@ -1,22 +1,19 @@
 'use server';
 
-import { BASE_URL } from '@/constant';
-import { BaseResType } from '@/types/hanaHakdang';
+import { SESSION_COOKIE_NAME } from '@/constant';
+import { BaseResType, Jwt } from '@/types/hanaHakdang';
+import { fetcher } from '@/utils/fetcher';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import {
-  MenteeSignUpType,
-  MentorSignUpType,
   ActionResType,
   LoginType,
+  MenteeSignUpType,
+  MentorSignUpType,
 } from './type';
 
 export async function sendEmail(email: string) {
-  const res = await fetch(`${BASE_URL}/send-email`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+  const res = await fetcher('POST', '/send-email', {
     body: JSON.stringify(email),
   });
 
@@ -36,10 +33,10 @@ export async function verifyEmail(
   email: string,
   authToken: string
 ): Promise<{ message: string; isError: boolean }> {
-  const url = `${BASE_URL}/verify-email?email=${encodeURIComponent(email)}&authToken=${encodeURIComponent(authToken)}`;
-  const res = await fetch(url, {
-    method: 'POST',
-  });
+  const res = await fetcher(
+    'POST',
+    `/verify-email?email=${encodeURIComponent(email)}&authToken=${encodeURIComponent(authToken)}`
+  );
 
   const data = await res.json();
   if (!res.ok) {
@@ -61,11 +58,7 @@ export async function menteeSignUp(
     birth: formData.get('birth') as string,
   };
 
-  const res = await fetch(`${BASE_URL}/signup/mentee`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+  const res = await fetcher('POST', '/signup/mentee', {
     body: JSON.stringify(signUpForm),
   });
 
@@ -81,11 +74,7 @@ export async function mentorSignUp(
 ): Promise<ActionResType<MentorSignUpType, string>> {
   const value = Object.fromEntries(formData) as MentorSignUpType;
 
-  const res = await fetch(`${BASE_URL}/signup/mentor`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+  const res = await fetcher('POST', '/signup/mentor', {
     body: JSON.stringify(value),
   });
 
@@ -104,13 +93,7 @@ export async function login(
     password: formData.get('password') as string,
   };
 
-  const res = await fetch(`${BASE_URL}/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(value),
-  });
+  const res = await fetcher('POST', '/login', { body: JSON.stringify(value) });
 
   if (!res.ok) {
     return {
@@ -120,12 +103,12 @@ export async function login(
     } as ActionResType<LoginType, string>;
   }
 
-  const c = res.headers.getSetCookie();
+  const data = (await res.json()) as BaseResType<Jwt>;
+
   const cookieStore = await cookies();
-  const slices = c[0].split(';')[0].split('=');
   cookieStore.set({
-    name: slices[0],
-    value: slices[1],
+    name: SESSION_COOKIE_NAME,
+    value: data.result.accessToken,
     httpOnly: true,
   });
 
