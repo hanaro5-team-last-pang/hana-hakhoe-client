@@ -5,7 +5,7 @@ import { createStore } from 'zustand/vanilla';
 type AuthResType = {
   userId: number;
   name: string;
-  role: string;
+  role: 'MENTOR' | 'MENTEE';
   profileImageUrl?: string;
   birthDate: string;
 };
