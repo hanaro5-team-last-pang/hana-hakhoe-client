@@ -2,6 +2,7 @@
 
 // TODO: ag-grid 표 컴포넌트 상태 관리 필요할 시 변경 필요
 import { MentoringTableType } from '@/app/(main)/mypage/type';
+import Button from '@/components/atoms/Button';
 import MentoringListTableStatus from '@/components/organisms/MentoringListTableStatus';
 import { useAuthStore } from '@/context/AuthContext';
 import {
@@ -9,9 +10,10 @@ import {
   ColDef,
   ClientSideRowModelModule,
   RowClickedEvent,
+  ICellRendererParams,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
 interface Props {
@@ -56,11 +58,43 @@ export default function MentoringListTable(props: Props) {
       minWidth: 110,
       cellRenderer: MentoringListTableStatus,
     },
+    // "강의실 입장" 또는 "리뷰 남기기" 컬럼 설정
     {
-      field: 'review',
-      headerName: role === 'mentor' ? '멘토링 수정' : '리뷰', // 역할에 따라 컬럼 헤더 변경
+      field: 'class',
+      headerName: role === 'mentor' ? '멘토링 수정' : '강의실',
       width: 130,
       minWidth: 110,
+      cellRenderer: (params: ICellRendererParams) => {
+        const buttonText =
+          params.data.status === '수강 완료'
+            ? '리뷰 남기기'
+            : role === 'mentor'
+              ? '멘토링 수정'
+              : '강의실 입장';
+
+        return (
+          <Button
+            type="button"
+            text={`${buttonText}`}
+            className="bg-red-50 text-pink-900 rounded-lg p-2 text-xs font-fontMedium"
+          />
+        );
+      },
+      // 버튼 클릭 이벤트
+      onCellClicked: (params) => {
+        if (params.data.status === '수강 완료') {
+          // '리뷰 남기기' 버튼 클릭 시 처리 로직
+          redirect(`/reviews/${params.data.id}`);
+        } else {
+          if (role === 'mentor') {
+            // '멘토링 수정' 클릭 시 처리 로직
+            redirect(`/mypage/open-mentoring/${params.data.id}`);
+          } else {
+            // '강의실 입장' 클릭 시 처리 로직
+            redirect(`/classroom/${params.data.id}`);
+          }
+        }
+      },
     },
     // 멘토일 때 "멘토링 삭제" 컬럼 추가
     ...(role === 'mentor'
@@ -86,7 +120,7 @@ export default function MentoringListTable(props: Props) {
   );
   return (
     <div
-      className={`min-h-[135px] h-[500px] w-full overflow-y-auto scrollbar-hide`}
+      className={`min-h-[135px] h-[215px] w-full overflow-y-auto scrollbar-hide`}
     >
       <AgGridReact
         rowData={mentorings}
