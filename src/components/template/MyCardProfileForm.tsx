@@ -74,7 +74,7 @@ export default function MyCardProfileForm({
   return (
     <div className="flex flex-col items-center">
       {!modifyMode ? (
-        <div className="relative w-64 h-64 my-4">
+        <div className="relative w-60 h-60 my-4">
           <Image
             className="rounded-full object-cover"
             src={showNewImage || userImage}
@@ -105,15 +105,15 @@ export default function MyCardProfileForm({
         <div>
           {profileFormData.map((items, index) => {
             return (
-              <div className="grid grid-cols-2 gap-2 my-2" key={index}>
-                <div className="text-gray-400 text-center">{items.key}</div>
-                <div className="text-black text-center">{items.value}</div>
+              <div className="grid grid-cols-[1fr,auto] gap-2 my-2" key={index}>
+                <div className="text-gray-400 text-left">{items.key}</div>
+                <div className="text-black text-right">{items.value}</div>
               </div>
             );
           })}
           <div className="grid grid-cols-2 gap-2 my-2">
             <input
-              className="text-gray-400 text-center w-32"
+              className="text-gray-400 text-left w-32"
               value={newProfileFormData.key}
               onChange={(e) =>
                 setNewProfileFormData({
@@ -123,7 +123,7 @@ export default function MyCardProfileForm({
               }
             />
             <input
-              className="text-black text-center w-32"
+              className="text-black text-right w-32"
               value={newProfileFormData.value}
               onChange={(e) =>
                 setNewProfileFormData({
@@ -151,10 +151,14 @@ export default function MyCardProfileForm({
       ) : (
         <div>
           {profileFormData.map((items, index) => (
-            <div className="grid grid-cols-2 gap-2 my-2" key={index}>
-              <div className="text-gray-400 text-center">{items.key}</div>
+            <div className="grid grid-cols-[1fr,auto] gap-4 my-2" key={index}>
+              <div className="text-gray-400 text-left max-x-fit">
+                {items.key}
+              </div>
               <div className="flex justify-center gap-2">
-                <div className="text-black text-center">{items.value}</div>
+                <div className="text-black text-right max-x-fit">
+                  {items.value}
+                </div>
                 {modifyMode && ( // modifyMode일 때만 삭제 버튼 보이기
                   <button onClick={() => deleteProfileFormData(index)}>
                     <IoTrashOutline className="font-light" />
