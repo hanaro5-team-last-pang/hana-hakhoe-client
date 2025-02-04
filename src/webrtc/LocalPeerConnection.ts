@@ -69,8 +69,7 @@ export default class LocalPeerConnection {
     try {
       await this._pConn.addIceCandidate(candidate);
     } catch {
-      console.error = () => {};
-      throw new Error('');
+      /* empty */
     }
   }
 

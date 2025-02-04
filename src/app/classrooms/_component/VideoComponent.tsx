@@ -40,6 +40,9 @@ export default function VideoComponent({ classroomId }: Props) {
           key: auth!.userId,
         });
       }
+      if (!auth.role) {
+        router.push('/login');
+      }
     }
   }, [isConnected, stream, auth]);
 

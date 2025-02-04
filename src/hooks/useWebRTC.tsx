@@ -127,7 +127,11 @@ const usePeerConnections = (
             ? await handleRemotePeer(key)
             : await handleLocalPeer(userId);
         if (type === 'Close' && key !== userId) {
-          closeClassroom(userId);
+          pcListMap.forEach(({ local, remote }) => {
+            local?.close();
+            remote?.close();
+          });
+          pcListMap.clear();
           router.replace(`/classrooms/${classroomId}/review`);
         }
       });
@@ -172,6 +176,7 @@ const usePeerConnections = (
                 }
               }
             } else {
+              console.log(303);
               return;
             }
           }
@@ -296,6 +301,7 @@ const usePeerConnections = (
       remote?.close();
     });
     pcListMap.clear();
+    router.replace(`/mentorings`);
   };
 
   return {
