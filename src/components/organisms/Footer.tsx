@@ -9,7 +9,7 @@ export default function Footer() {
             <img className="w-32" src="/logo_header.png" alt="로고" />
           </Link>
           <p className="text-sm text-banlance text-gray-600">
-            저희 하나 학당은 배움에 나이가 없다고 생각합니다. 누구나 배움의 뜻이
+            저희 하나 학회은 배움에 나이가 없다고 생각합니다. 누구나 배움의 뜻이
             있는 분들에게 비대면 화상 강의라는 새로운 비전을 제시하여 배움의
             장을 열어드리려 합니다.
           </p>

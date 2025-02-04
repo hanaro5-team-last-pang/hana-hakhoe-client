@@ -26,43 +26,6 @@ export default function ProfileDropdown({ authData, fetchAuth }: Props) {
     location.reload();
   }, []);
 
-  const menuItems = [
-    <div>
-      <div className="flex items-center mr-10 mt-2">
-        <div className="relative text-2xl">
-          <HiOutlineUserCircle />
-        </div>
-        <p className="mx-1 text-sm font-semibold">
-          {name} {role === 'mentor' ? '멘토' : '회원'}님
-        </p>
-      </div>
-      <hr className="border-t border-gray-300 mt-3 mb-3" />
-    </div>,
-    <Link className="flex my-2 items-center" href="/mypage/open-mentoring">
-      <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
-        <PiShoppingBagOpen />
-      </div>
-      <div className="text-xs px-2">새 강의 만들기</div>
-    </Link>,
-    <Link
-      className="flex my-2 items-center"
-      href={
-        role === 'mentor' ? '/mypage/card-settings' : '/mypage/account-settings'
-      }
-    >
-      <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
-        <PiUser />
-      </div>
-      <div className="text-xs px-2">마이 페이지</div>
-    </Link>,
-    <Button className="flex my-2 items-center" type="button" onClick={logOut}>
-      <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
-        <PiArrowSquareOut />
-      </div>
-      <div className="text-xs px-2">로그아웃</div>
-    </Button>,
-  ];
-
   return (
     <Dropdown
       menuButton={
@@ -75,11 +38,50 @@ export default function ProfileDropdown({ authData, fetchAuth }: Props) {
           />
         </div>
       }
-      menuItems={menuItems}
+      menuItems={[]}
       anchor={'bottom start'}
       menuItemsClassName={
         'bg-white my-2 rounded-lg scrollbar-hide border border-gray-200 p-2 shadow-lg z-30'
       }
-    />
+    >
+      <div>
+        <div className="flex items-center mr-10 mt-2">
+          <div className="relative text-2xl">
+            <HiOutlineUserCircle />
+          </div>
+          <p className="mx-1 text-sm font-semibold">
+            {name} {role === 'mentor' ? '멘토' : '회원'}님
+          </p>
+        </div>
+        <hr className="border-t border-gray-300 mt-3 mb-3" />
+      </div>
+      {role === 'mentor' && (
+        <Link className="flex my-2 items-center" href="/mypage/open-mentoring">
+          <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
+            <PiShoppingBagOpen />
+          </div>
+          <div className="text-xs px-2">새 강의 만들기</div>
+        </Link>
+      )}
+      <Link
+        className="flex my-2 items-center"
+        href={
+          role === 'mentor'
+            ? '/mypage/card-settings'
+            : '/mypage/account-settings'
+        }
+      >
+        <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
+          <PiUser />
+        </div>
+        <div className="text-xs px-2">마이 페이지</div>
+      </Link>
+      <Button className="flex my-2 items-center" type="button" onClick={logOut}>
+        <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
+          <PiArrowSquareOut />
+        </div>
+        <div className="text-xs px-2">로그아웃</div>
+      </Button>
+    </Dropdown>
   );
 }
