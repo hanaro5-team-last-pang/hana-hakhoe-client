@@ -3,8 +3,6 @@
 import Button from '@/components/atoms/Button';
 import Dropdown from '@/components/atoms/Dropdown';
 import {
-  ANSWER_PUBLISH_URL,
-  ANSWER_SUBSCRIBE_URL,
   ENTER_PUBLISH_URL,
   ENTER_SUBSCRIBE_URL,
   SIGNALING_PUBLISH_URL,
@@ -12,6 +10,7 @@ import {
   TRICKLE_PUBLISH_URL,
   TRICKLE_SUBSCRIBE_URL,
 } from '@/constant';
+import { useAuthStore } from '@/context/AuthContext';
 import {
   StompIsConnectedContext,
   StompPublishContext,
@@ -24,13 +23,7 @@ import RemotePeerConnection from '@/webrtc/RemotePeerConnection';
 import { IMessage } from '@stomp/stompjs';
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/navigation';
-import React, {
-  useEffect,
-  useState,
-  useContext,
-  useCallback,
-  useRef,
-} from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 
 interface Props {
   classroomId: bigint;
@@ -38,6 +31,7 @@ interface Props {
 
 export default function VideoComponent({ classroomId }: Props) {
   const router = useRouter();
+  const { auth, loading } = useAuthStore((state) => state);
   const { videoRef, changeDevice, stream } = useLocalVideo();
   const { videoDevices, audioDevices } = useMediaDevices();
   const isConnected = useContext(StompIsConnectedContext);
@@ -49,9 +43,7 @@ export default function VideoComponent({ classroomId }: Props) {
       { local: LocalPeerConnection | null; remote: RemotePeerConnection | null }
     >
   >(new Map());
-  const currentKey = useRef<string>(uuidv4());
-  const mentorKey = useRef<string | null>(null);
-  const [role, setRole] = useState<'mentor' | 'mentee' | null>(null);
+  const userId = auth ? auth.userId : null;
 
   const setupIceCandidateHandling = (
     peerConnection: LocalPeerConnection | RemotePeerConnection,
@@ -94,15 +86,15 @@ export default function VideoComponent({ classroomId }: Props) {
 
   const handleLocalPeer = async (uniqueStr?: string, remoteId?: string) => {
     const localPeerConnection = initializePeerConnection(
-      uniqueStr ? uniqueStr : currentKey.current,
+      uniqueStr ? uniqueStr : userId!,
       false
     ) as LocalPeerConnection;
     const mentorVideoElement = createVideoElement(
-      uniqueStr ? uniqueStr : currentKey.current
+      uniqueStr ? uniqueStr : userId!
     );
 
     localPeerConnection.addRemoteTrack(mentorVideoElement);
-    pcListMap.set(uniqueStr ? uniqueStr : currentKey.current, {
+    pcListMap.set(uniqueStr ? uniqueStr : userId!, {
       local: localPeerConnection,
       remote: null,
     });
@@ -111,7 +103,7 @@ export default function VideoComponent({ classroomId }: Props) {
       (offer) => {
         publish(SIGNALING_PUBLISH_URL(classroomId), offer);
       },
-      uniqueStr ? uniqueStr : currentKey.current,
+      uniqueStr ? uniqueStr : userId!,
       remoteId
     );
   };
@@ -133,13 +125,13 @@ export default function VideoComponent({ classroomId }: Props) {
     subscribe(ENTER_SUBSCRIBE_URL(classroomId), async (message: IMessage) => {
       const { type, key } = JSON.parse(message.body);
       if (type === 'Enter') {
-        if (key !== currentKey.current) await handleRemotePeer(key);
+        if (key !== userId) await handleRemotePeer(key);
         else {
           await handleLocalPeer();
         }
       }
 
-      if (type === 'Close' && key !== currentKey.current) {
+      if (type === 'Close' && key !== userId) {
         pcListMap.forEach(({ local, remote }) => {
           local?.close();
           remote?.close();
@@ -157,64 +149,69 @@ export default function VideoComponent({ classroomId }: Props) {
         const { peerId, remoteId, description } = JSON.parse(
           JSON.parse(message.body)
         );
-        const connection = pcListMap.get(peerId);
+        if (description.type === 'offer') {
+          const connection = pcListMap.get(peerId);
 
-        let remotePeerConnection = connection ? connection.remote : undefined;
+          let remotePeerConnection = connection?.remote;
 
-        if (remoteId && remoteId !== currentKey.current) {
-          return;
-        }
+          if (remoteId && remoteId !== userId) {
+            return;
+          }
 
-        if (remoteId && remoteId === currentKey.current) {
-          if (!remotePeerConnection) {
-            if (!pcListMap.has(peerId)) {
-              remotePeerConnection = initializePeerConnection(
-                peerId,
-                true
-              ) as RemotePeerConnection;
-              const videoElement = createVideoElement(`video-${peerId}`);
+          if (remoteId && remoteId === userId) {
+            if (!remotePeerConnection) {
+              if (!pcListMap.has(peerId)) {
+                remotePeerConnection = initializePeerConnection(
+                  peerId,
+                  true
+                ) as RemotePeerConnection;
+                const videoElement = createVideoElement(`video-${peerId}`);
 
-              remotePeerConnection.addRemoteTrack(videoElement);
-              pcListMap.set(peerId, {
-                local: null,
-                remote: remotePeerConnection,
-              });
+                remotePeerConnection.addRemoteTrack(videoElement);
+                pcListMap.set(peerId, {
+                  local: null,
+                  remote: remotePeerConnection,
+                });
+              }
             }
           }
-        }
 
-        if (remotePeerConnection) {
-          await remotePeerConnection.receiveOfferCallback(
-            description,
-            (answerText) => {
-              publish(ANSWER_PUBLISH_URL(classroomId), answerText);
-            },
-            currentKey.current
-          );
+          if (remotePeerConnection) {
+            await remotePeerConnection.receiveOfferCallback(
+              description,
+              (answerText) => {
+                publish(SIGNALING_PUBLISH_URL(classroomId), answerText);
+              },
+              userId!
+            );
+          }
+        }
+        if (description.type === 'answer') {
+          const connection = pcListMap.get(peerId);
+          const localPeerConnection = connection?.local;
+
+          if (!localPeerConnection) {
+            return;
+          }
+
+          if (localPeerConnection.remotePeerId) {
+            if (localPeerConnection.remotePeerId !== remoteId) {
+              const newLocalPeerId = uuidv4();
+              await handleLocalPeer(newLocalPeerId, remoteId);
+            }
+            return;
+          }
+
+          localPeerConnection.setRemoteId = remoteId;
+
+          if (remoteId === userId) {
+            moveToMentorContainer(peerId);
+          }
+
+          await localPeerConnection.receiveAnswerCallback(description);
         }
       }
     );
-
-    subscribe(ANSWER_SUBSCRIBE_URL(classroomId), async (message: IMessage) => {
-      const { peerId, remoteId, description } = JSON.parse(
-        JSON.parse(message.body)
-      );
-      const localPeerConnection = pcListMap.get(peerId)?.local;
-
-      if (localPeerConnection) {
-        if (
-          localPeerConnection.remotePeerId &&
-          localPeerConnection.remotePeerId !== remoteId
-        ) {
-          await handleLocalPeer(uuidv4(), remoteId);
-        }
-        localPeerConnection.setRemoteId = remoteId;
-        if (remoteId === mentorKey.current) {
-          moveToMentorContainer(peerId);
-        }
-        await localPeerConnection.receiveAnswerCallback(description);
-      }
-    });
 
     subscribe(TRICKLE_SUBSCRIBE_URL(classroomId), async (message: IMessage) => {
       const { peerId, candidate } = JSON.parse(JSON.parse(message.body));
@@ -328,7 +325,7 @@ export default function VideoComponent({ classroomId }: Props) {
   const closeClassrooms = () => {
     publish(ENTER_PUBLISH_URL(classroomId), {
       type: 'Close',
-      key: currentKey.current,
+      key: userId,
     });
 
     pcListMap.forEach(({ local, remote }) => {
@@ -337,7 +334,6 @@ export default function VideoComponent({ classroomId }: Props) {
     });
 
     pcListMap.clear();
-    localStorage.removeItem('mentorKey');
     router.push(`/mentorings/${classroomId}`);
   };
 
@@ -349,39 +345,43 @@ export default function VideoComponent({ classroomId }: Props) {
   };
 
   useEffect(() => {
-    if (isConnected && stream) {
-      const storedMentorKey = localStorage.getItem('mentorKey');
-      if (!storedMentorKey) {
-        setRole('mentor');
-        localStorage.setItem('mentorKey', currentKey.current);
-        mentorKey.current = currentKey.current;
+    if (isConnected && stream && auth) {
+      if (auth.role === 'MENTOR') {
         subscribeEnter();
-      } else {
-        setRole('mentee');
-        mentorKey.current = storedMentorKey;
+      }
+      if (auth.role === 'MENTEE') {
         subscribeEnter();
         publish(ENTER_PUBLISH_URL(classroomId), {
           type: 'Enter',
-          key: currentKey.current,
+          key: userId,
         });
       }
     }
-  }, [isConnected, stream]);
+  }, [isConnected, stream, auth]);
 
   return (
     <div className="overflow-y-auto flex flex-col scrollbar-hide">
-      {role === 'mentor' ? (
-        <div
-          id="remote-video-container"
-          className={`grid ${getGridSize()} gap-2 p-2 w-4/5 h-4/5`}
-        ></div>
+      {loading ? (
+        <></>
       ) : (
         <>
-          <div id="mentor-video-container" className="p-2 h-3/5 w-4/5"></div>
-          <div
-            id="remote-video-container"
-            className="h-1/5 grid grid-cols-4 p-2 w-4/5"
-          ></div>
+          {auth!.role === 'MENTOR' ? (
+            <div
+              id="remote-video-container"
+              className={`grid ${getGridSize()} gap-2 p-2 w-4/5 h-4/5`}
+            ></div>
+          ) : (
+            <>
+              <div
+                id="mentor-video-container"
+                className="p-2 h-3/5 w-4/5"
+              ></div>
+              <div
+                id="remote-video-container"
+                className="h-1/5 grid grid-cols-4 p-2 w-4/5 gap-2"
+              ></div>
+            </>
+          )}{' '}
         </>
       )}
       <div className="w-full h-1/5"></div>
@@ -417,21 +417,27 @@ export default function VideoComponent({ classroomId }: Props) {
           anchor="bottom"
           menuItemsClassName="bg-white rounded-lg drop-shadow scrollbar-hide border border-gray-200 px-2 z-30 w-[450px] my-2"
         />
-        {role === 'mentor' && (
-          <Button
-            type="button"
-            text="화면 공유"
-            className="rounded-full bg-ourOrange text-white text-sm font-medium px-4 py-2 shadow-md"
-            onClick={startScreenStream}
-          />
-        )}
-        {role === 'mentor' && (
-          <Button
-            type="submit"
-            text="강의 종료"
-            className="rounded-full bg-ourOrange text-white text-sm font-medium px-4 py-2 shadow-md"
-            onClick={closeClassrooms}
-          />
+        {loading ? (
+          <></>
+        ) : (
+          <>
+            {auth!.role === 'MENTOR' && (
+              <>
+                <Button
+                  type="button"
+                  text="화면 공유"
+                  className="rounded-full bg-ourOrange text-white text-sm font-medium px-4 py-2 shadow-md"
+                  onClick={startScreenStream}
+                />
+                <Button
+                  type="submit"
+                  text="강의 종료"
+                  className="rounded-full bg-ourOrange text-white text-sm font-medium px-4 py-2 shadow-md"
+                  onClick={closeClassrooms}
+                />
+              </>
+            )}{' '}
+          </>
         )}
       </div>
     </div>
