@@ -10,6 +10,7 @@ export default function Page() {
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [isError, setIsError] = useState<boolean>(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   const email = searchParams.get('email');
   const authToken = searchParams.get('authToken');
@@ -23,6 +24,21 @@ export default function Page() {
           setLoading(false);
           setMessage(response.message);
           setIsError(response.isError);
+
+          // 인증 성공 시 카운트다운 시작 후 창 닫기
+          if (!response.isError) {
+            let counter = 3;
+            setCountdown(counter);
+
+            const interval = setInterval(() => {
+              counter -= 1;
+              setCountdown(counter);
+              if (counter <= 0) {
+                clearInterval(interval);
+                window.close();
+              }
+            }, 1000);
+          }
         })
         .catch((error) => {
           setLoading(false);
@@ -36,11 +52,18 @@ export default function Page() {
   }, [router]);
 
   return (
-    <div className="wrapper p-10">
+    <div className="w-full items-center p-10 text-center">
       <h1>{loading ? '이메일 인증 중...' : message}</h1>
       {loading && <div>로딩 중...</div>}
       {isError && <div style={{ color: 'red' }}>인증 실패: {message}</div>}
-      {!isError && !loading && <div>인증 성공, 3초 후에 창이 닫힙니다. </div>}
+      {!isError && !loading && (
+        <div>
+          <p>
+            인증 성공, {countdown !== null ? `${countdown}초 후에` : ''} 창이
+            닫힙니다.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

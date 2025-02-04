@@ -1,7 +1,8 @@
 'use server';
 
+import { LectureType } from '@/app/(main)/mentorings/type';
 import { BASE_HEADERS, BASE_URL } from '@/constant';
-import { BaseResType } from '@/types/hanaHakdang';
+import { ActionResType } from '@/types/hanaHakdang';
 import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
 import { notFound } from 'next/navigation';
 
@@ -11,7 +12,7 @@ import { notFound } from 'next/navigation';
 
 export async function enrollLecture(
   lectureId: number
-): Promise<BaseResType<string>> {
+): Promise<ActionResType<LectureType, string>> {
   const jsessionIdCookie = await checkAuthAndGetCookie();
 
   const res = await fetch(BASE_URL + `/lectures/${lectureId}/enroll`, {
@@ -27,13 +28,12 @@ export async function enrollLecture(
   }
 
   const result = await res.json();
-
-  return result.result;
+  return result.message;
 }
 
 export async function withdrawLecture(
   lectureId: number
-): Promise<BaseResType<string>> {
+): Promise<ActionResType<LectureType, string>> {
   const jsessionIdCookie = await checkAuthAndGetCookie();
 
   const res = await fetch(BASE_URL + `/lectures/${lectureId}/enroll`, {

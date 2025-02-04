@@ -1,3 +1,6 @@
+'use client';
+
+import { enrollLecture } from '@/app/(main)/mentorings/[id]/actions';
 import { LectureType } from '@/app/(main)/mentorings/type';
 import { Badge } from '@/components/atoms/Badge';
 import Button from '@/components/atoms/Button';
@@ -6,6 +9,7 @@ import dayjs from 'dayjs';
 import { BsFillBarChartFill } from 'react-icons/bs';
 import { FaClock } from 'react-icons/fa';
 import { RiGraduationCapFill } from 'react-icons/ri';
+import { toast } from 'react-toastify';
 import Image from 'next/image';
 
 interface Props {
@@ -17,6 +21,7 @@ const DEFAULT_IMAGE_URL = '/img_landing.png';
 
 export default function MentoringIntro(props: Props) {
   const {
+    lectureId,
     category,
     startTime,
     mentorName,
@@ -26,6 +31,16 @@ export default function MentoringIntro(props: Props) {
     title,
     thumbnailImgUrl,
   } = props.lectureData;
+
+  const handleEnroll = async () => {
+    try {
+      const result = await enrollLecture(lectureId);
+      toast.success(result.message);
+    } catch (error) {
+      console.log(error);
+      toast.error('수강 신청에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
 
   // thumbnailImgUrl이 없으면 기본 이미지 사용
   const imageUrl = thumbnailImgUrl || DEFAULT_IMAGE_URL;
@@ -81,9 +96,10 @@ export default function MentoringIntro(props: Props) {
               />
               <div className="absolute bottom-0 right-0 p-2">
                 <Button
-                  type="submit"
+                  type="button"
                   text="수강 신청"
                   className="bg-ourOrange text-white rounded-full py-2 px-4 mr-3 mb-1 hover:bg-orange-600 transition"
+                  onClick={handleEnroll}
                 />
               </div>
             </div>

@@ -5,6 +5,7 @@ import {
   MentoringResponseType,
   ProfileRequestType,
   ProfileResponseType,
+  MenteeMentoringsResType,
 } from '@/app/(main)/mypage/type';
 import { AccountType, ActionResType, BaseResType } from '@/types/hanaHakdang';
 import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
@@ -121,4 +122,38 @@ export async function openMentoring(
 
   console.log(data);
   redirect('/mypage/mentorings');
+}
+
+//멘티의 멘토링 수강 신청 조회 : 시작 전
+export async function getMentoringsForMentee(): Promise<MenteeMentoringsResType> {
+  const jsessionIdCookie = await checkAuthAndGetCookie();
+
+  const page = 0; // 원하는 페이지 값
+
+  const res = await fetch(`${BASE_URL}/lectures/queue/mentee?page=${page}`, {
+    method: 'GET',
+    headers: {
+      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
+    },
+  });
+
+  const data = (await res.json()) as BaseResType<MenteeMentoringsResType>;
+  return data.result;
+}
+
+//멘티의 멘토링 수강 신청 조회 : 완료 기록
+export async function getMentoringsHistory(): Promise<MenteeMentoringsResType> {
+  const jsessionIdCookie = await checkAuthAndGetCookie();
+
+  const page = 0; // 원하는 페이지 값 받아오기
+
+  const res = await fetch(`${BASE_URL}/lectures/history/mentee?page=${page}`, {
+    method: 'GET',
+    headers: {
+      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
+    },
+  });
+
+  const data = (await res.json()) as BaseResType<MenteeMentoringsResType>;
+  return data.result;
 }
