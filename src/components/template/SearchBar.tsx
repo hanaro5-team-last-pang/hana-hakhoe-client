@@ -3,21 +3,26 @@
 import { handleSearchAction } from '@/app/action';
 import Button from '@/components/atoms/Button';
 import { FaSearch } from 'react-icons/fa';
-import { useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { FormEvent, useRef } from 'react';
 
 export default function SearchBar() {
+  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSearch = async () => {
-    if (inputRef.current) {
-      const formData = new FormData();
-      formData.append('search', inputRef.current.value);
-      await handleSearchAction(formData);
+  const submitSearch = (e: FormEvent) => {
+    e.preventDefault();
+    const inputValue = inputRef.current?.value;
+    if (inputValue) {
+      router.push(`/mentorings?keyword=${inputValue}`);
     }
   };
 
   return (
-    <div className="flex items-center border-b border-gray-700">
+    <form
+      className="flex items-center border-b border-gray-700"
+      onSubmit={submitSearch}
+    >
       <div className="flex-1">
         <input
           type="text"
@@ -28,14 +33,10 @@ export default function SearchBar() {
         />
       </div>
       <div>
-        <Button
-          type="button"
-          onClick={handleSearch}
-          className="flex items-center justify-center"
-        >
+        <Button type="button" className="flex items-center justify-center">
           <FaSearch className="text-gray-700" />
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

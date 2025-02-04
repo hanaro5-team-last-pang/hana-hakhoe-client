@@ -15,6 +15,7 @@ export type AuthType = {
   name: string;
   role: string;
   profileImage: string;
+  birth: string;
 };
 
 export type ChatResponseType = {

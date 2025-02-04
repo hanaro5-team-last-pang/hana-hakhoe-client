@@ -1,10 +1,14 @@
-import { getLectureList } from '@/app/(main)/mentorings/actions';
-import { LectureType } from '@/app/(main)/mentorings/type';
+import {
+  CategoryList,
+  LectureListResponse,
+  LectureType,
+} from '@/app/(main)/mentorings/type';
 import CheckboxList from '@/components/molecules/CheckboxList';
 import CardView from '@/components/organisms/CardView';
 import MentoringList from '@/components/organisms/MentoringList';
 import SearchBar from '@/components/template/SearchBar';
-import { age_category, category } from '@/utils/dummy';
+import { BaseResType } from '@/types/hanaHakdang';
+import { fetcher } from '@/utils/fetcher';
 import dayjs from 'dayjs';
 
 //TODO: 임시 default image
@@ -25,9 +29,40 @@ const LectureToCardData = (lecture: LectureType) => {
   };
 };
 
-export default async function Page() {
-  const result = await getLectureList();
-  const cardData = result.map(LectureToCardData);
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+
+export default async function Page(props: { searchParams: SearchParams }) {
+  const searchParams = await props.searchParams;
+
+  let category: string = '';
+  if (typeof searchParams.category === 'string') {
+    category = searchParams.category;
+  }
+  let page = Number(searchParams.page);
+  if (isNaN(page)) {
+    page = 0;
+  }
+  let keyword: string = '';
+  if (typeof searchParams.keyword === 'string') {
+    keyword = searchParams.keyword;
+  }
+  const subUrl = keyword
+    ? `/search?keyword=${keyword}&page=${page}`
+    : category
+      ? `/lectures/category?name=${category}&page=${page}`
+      : `/lectures?page=${page}`;
+
+  console.log(subUrl);
+  const responses = await Promise.all([
+    fetcher('GET', subUrl),
+    fetcher('GET', '/lectures/categories'),
+  ]);
+
+  const searchResult =
+    (await responses[0].json()) as BaseResType<LectureListResponse>;
+  const cardData = searchResult.result.lectureList.map(LectureToCardData);
+  const categoryResult =
+    (await responses[1].json()) as BaseResType<CategoryList>;
 
   return (
     <>
@@ -56,21 +91,7 @@ export default async function Page() {
           <div className="w-full">
             <div className="mb-8">
               <div className="text-sm mb-3 font-semibold">멘토링 카테고리</div>
-              {/*<CheckboxList*/}
-              {/*  items={category}*/}
-              {/*  textClassName="text-sm"*/}
-              {/*  selectedTags={selectedCategoryTags}*/}
-              {/*  onChange={handleCategoryChange}*/}
-              {/*/>*/}
-            </div>
-            <div>
-              <div className="text-sm mb-3 font-semibold">연령 카테고리</div>
-              {/*<CheckboxList*/}
-              {/*  items={age_category}*/}
-              {/*  textClassName="text-sm"*/}
-              {/*  selectedTags={selectedAgeCategoryTags}*/}
-              {/*  onChange={handleAgeCategoryChange}*/}
-              {/*/>*/}
+              <CheckboxList items={categoryResult.result.categories} />
             </div>
           </div>
         </div>

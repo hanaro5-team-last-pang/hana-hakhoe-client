@@ -63,3 +63,12 @@ export type FaqFormType = {
   lectureId: number;
   content: string;
 };
+
+export type Category = {
+  tag: string;
+  name: string;
+};
+
+export type CategoryList = {
+  categories: Category[];
+};

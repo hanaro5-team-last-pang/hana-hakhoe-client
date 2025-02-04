@@ -55,6 +55,7 @@ export async function changeProfileForm(
   const res = await fetcher('PATCH', '/account', {
     body: reqFormData,
     jwt: accessJwtCookie.value,
+    header: {},
   });
 
   if (!res.ok) {

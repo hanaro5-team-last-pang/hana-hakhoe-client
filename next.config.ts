@@ -19,7 +19,6 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'cdn.fetimes.co.kr',
-        port: '',
       },
     ],
   },

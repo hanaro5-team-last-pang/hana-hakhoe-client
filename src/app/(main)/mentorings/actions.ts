@@ -9,27 +9,16 @@ import {
 } from '@/app/(main)/mentorings/type';
 import { ProfileResponseType } from '@/app/(main)/mypage/type';
 import { ActionResType, BaseResType } from '@/types/hanaHakdang';
-import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
+import { checkAuthAndGetCookie, getAuthCookie } from '@/utils/CheckCookies';
 import { fetcher } from '@/utils/fetcher';
 import { notFound } from 'next/navigation';
 
 //전체 멘토링 조회
 export async function getLectureList() {
-  const res = await fetcher('GET', '/lectures');
+  const accessJwtCookie = await getAuthCookie();
 
-  if (!res.ok) {
-    notFound();
-  }
-  const data = (await res.json()) as BaseResType<LectureListResponse>;
-  return data.result.lectureList;
-}
-
-//키워드 검색
-export async function getLectureSearch() {
-  const accessJwtCookie = await checkAuthAndGetCookie();
-
-  const res = await fetcher('GET', '/search', {
-    jwt: accessJwtCookie.value,
+  const res = await fetcher('GET', '/lectures', {
+    jwt: accessJwtCookie?.value,
   });
 
   if (!res.ok) {

@@ -1,5 +1,5 @@
 import { DEFAULT_PROFILE_URL } from '@/constant';
-import { AuthType } from '@/types/hanaHakdang';
+import { AuthType, BaseResType } from '@/types/hanaHakdang';
 import { createStore } from 'zustand/vanilla';
 
 type AuthResType = {
@@ -7,7 +7,7 @@ type AuthResType = {
   name: string;
   role: string;
   profileImageUrl?: string;
-  birth?: string;
+  birthDate: string;
 };
 
 export type AuthState = {
@@ -36,11 +36,13 @@ export const createAuthStore = (initState: AuthState = defaultInitState) => {
         const res = await fetch('/api/user-info', {
           method: 'GET',
         });
-        const data = (await res.json()) as AuthResType;
+        const data = (await res.json()) as BaseResType<AuthResType>;
+        const auth = data.result;
         set({
           auth: {
-            ...data,
-            profileImage: data.profileImageUrl ?? DEFAULT_PROFILE_URL,
+            ...auth,
+            profileImage: auth.profileImageUrl ?? DEFAULT_PROFILE_URL,
+            birth: auth.birthDate,
           },
         });
       } catch (error) {

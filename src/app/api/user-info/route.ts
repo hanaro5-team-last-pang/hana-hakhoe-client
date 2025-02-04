@@ -1,5 +1,5 @@
-import { BASE_HEADERS, BASE_URL, SESSION_COOKIE_NAME } from '@/constant';
-import { AuthType, BaseResType } from '@/types/hanaHakdang';
+import { SESSION_COOKIE_NAME } from '@/constant';
+import { fetcher } from '@/utils/fetcher';
 import { cookies } from 'next/headers';
 
 export async function GET() {
@@ -10,17 +10,13 @@ export async function GET() {
     return new Response();
   }
 
-  const accessToken = sessionCookie.value;
-
-  const res = await fetch(BASE_URL + '/user-info', {
-    method: 'GET',
-    headers: {
-      ...BASE_HEADERS,
-      Authorization: `Bearer ${accessToken}`,
-    },
+  const res = await fetcher('GET', '/user-info', {
+    jwt: sessionCookie.value,
   });
 
-  const data = (await res.json()) as BaseResType<AuthType>;
+  if (!res.ok) {
+    return new Response();
+  }
 
-  return Response.json(data.result);
+  return Response.json(await res.json());
 }
