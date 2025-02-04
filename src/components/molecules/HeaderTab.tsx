@@ -58,7 +58,7 @@ export default function HeaderTab() {
         <div>
           {showTabComponent && (
             <div className="rounded-lg drop-shadow scrollbar-hide border border-gray-200 px-2 bg-white text-black">
-              {loginUserRole === 'mentor' && (
+              {loginUserRole === 'MENTOR' && (
                 <Link
                   className="flex my-4 items-center"
                   href="/mypage/card-settings"

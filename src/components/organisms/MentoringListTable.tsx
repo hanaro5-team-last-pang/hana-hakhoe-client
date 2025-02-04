@@ -41,7 +41,7 @@ export default function MentoringListTable(props: Props) {
       minWidth: 140,
     },
     // 멘토일 경우 강사명 컬럼 제거
-    ...(role === 'mentor'
+    ...(role === 'MENTOR'
       ? []
       : [
           {
@@ -61,14 +61,14 @@ export default function MentoringListTable(props: Props) {
     // "강의실 입장" 또는 "리뷰 남기기" 컬럼 설정
     {
       field: 'class',
-      headerName: role === 'mentor' ? '멘토링 수정' : '강의실',
+      headerName: role === 'MENTOR' ? '멘토링 수정' : '강의실',
       width: 130,
       minWidth: 110,
       cellRenderer: (params: ICellRendererParams) => {
         const buttonText =
           params.data.status === '수강 완료'
             ? '리뷰 남기기'
-            : role === 'mentor'
+            : role === 'MENTOR'
               ? '멘토링 수정'
               : '강의실 입장';
 
@@ -86,7 +86,7 @@ export default function MentoringListTable(props: Props) {
           // '리뷰 남기기' 버튼 클릭 시 처리 로직
           redirect(`/reviews/${params.data.id}`);
         } else {
-          if (role === 'mentor') {
+          if (role === 'MENTOR') {
             // '멘토링 수정' 클릭 시 처리 로직
             redirect(`/mypage/open-mentoring/${params.data.id}`);
           } else {
@@ -97,7 +97,7 @@ export default function MentoringListTable(props: Props) {
       },
     },
     // 멘토일 때 "멘토링 삭제" 컬럼 추가
-    ...(role === 'mentor'
+    ...(role === 'MENTOR'
       ? [
           {
             field: 'delete',

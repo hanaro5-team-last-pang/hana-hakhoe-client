@@ -16,7 +16,7 @@ export default function MyPageNavbar() {
 
   return (
     <div className="wrapper scrollbar-hide">
-      {loginUserRole === 'mentor' && (
+      {loginUserRole === 'MENTOR' && (
         <Link
           className={clsx(
             'flex my-4 items-center rounded-lg p-2',

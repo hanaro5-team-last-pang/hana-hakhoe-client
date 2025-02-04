@@ -20,7 +20,7 @@ export default function Page() {
     if (auth?.role) {
       const fetchData = async () => {
         try {
-          if (auth.role === 'mentor') {
+          if (auth.role === 'MENTOR') {
             // 멘토일 경우
             const result = await getMentorings();
 
@@ -81,9 +81,9 @@ export default function Page() {
     <div className="w-full">
       <div className="flex justify-between items-center">
         <div className="text-ourGreen m-2 text-2xl font-bold">
-          {auth?.role === 'mentor' ? '나의 멘토링 기록' : '멘토링 신청 기록'}
+          {auth?.role === 'MENTOR' ? '나의 멘토링 기록' : '멘토링 신청 기록'}
         </div>
-        {auth?.role === 'mentor' && (
+        {auth?.role === 'MENTOR' && (
           <LinkButton
             label="멘토링 개설하기"
             route={'/mypage/open-mentoring'}

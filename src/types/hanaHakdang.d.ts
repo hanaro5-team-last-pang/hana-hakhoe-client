@@ -13,7 +13,7 @@ export type BaseResType<T> = {
 export type AuthType = {
   userId: number;
   name: string;
-  role: string;
+  role: 'MENTOR' | 'MENTEE' | undefined;
   profileImage: string;
   birth: string;
 };

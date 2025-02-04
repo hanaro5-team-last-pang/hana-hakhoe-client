@@ -50,12 +50,12 @@ export default function ProfileDropdown({ authData, fetchAuth }: Props) {
             <HiOutlineUserCircle />
           </div>
           <p className="mx-1 text-sm font-semibold">
-            {name} {role === 'mentor' ? '멘토' : '회원'}님
+            {name} {role === 'MENTOR' ? '멘토' : '회원'}님
           </p>
         </div>
         <hr className="border-t border-gray-300 mt-3 mb-3" />
       </div>
-      {role === 'mentor' && (
+      {role === 'MENTOR' && (
         <Link className="flex my-2 items-center" href="/mypage/open-mentoring">
           <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
             <PiShoppingBagOpen />
@@ -66,7 +66,7 @@ export default function ProfileDropdown({ authData, fetchAuth }: Props) {
       <Link
         className="flex my-2 items-center"
         href={
-          role === 'mentor'
+          role === 'MENTOR'
             ? '/mypage/card-settings'
             : '/mypage/account-settings'
         }
