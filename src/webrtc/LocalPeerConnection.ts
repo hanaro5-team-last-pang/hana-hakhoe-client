@@ -64,8 +64,11 @@ export default class LocalPeerConnection {
     if (!this._pConn) {
       throw new Error('원격 연결을 찾을 수 없습니다.');
     }
-    if (this._pConn.remoteDescription) {
+    try {
       await this._pConn.addIceCandidate(candidate);
+    } catch {
+      console.error = () => {};
+      throw new Error('');
     }
   }
 
