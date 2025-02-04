@@ -1,6 +1,7 @@
 'use client';
 
 import Tab from '@/components/atoms/Tab';
+import { useAuthStore } from '@/context/AuthContext';
 import { IoIdCardOutline } from 'react-icons/io5';
 import { MdOutlineAccountBox } from 'react-icons/md';
 import { PiShoppingBagOpen } from 'react-icons/pi';
@@ -9,7 +10,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 
 export default function HeaderTab() {
-  const loginUserRole = 'mentor'; // 로그인 상태 관리는 전역 상태 관리로 이루어질 예정
+  const { auth } = useAuthStore((state) => state);
+  const loginUserRole = auth?.role;
   const router = useRouter();
   const currentLocation = usePathname();
   const [showTabComponent, setShowTabComponent] = useState(false);
@@ -69,21 +71,21 @@ export default function HeaderTab() {
               )}
               <Link
                 className="flex my-4 items-center"
-                href="/mypage/account-settings"
-              >
-                <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
-                  <MdOutlineAccountBox />
-                </div>
-                <div className="text-sm px-2">계정 설정</div>
-              </Link>
-              <Link
-                className="flex my-4 items-center"
                 href="/mypage/mentorings"
               >
                 <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
                   <PiShoppingBagOpen />
                 </div>
                 <div className="text-sm px-2">멘토링 기록</div>
+              </Link>
+              <Link
+                className="flex my-4 items-center"
+                href="/mypage/account-settings"
+              >
+                <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
+                  <MdOutlineAccountBox />
+                </div>
+                <div className="text-sm px-2">계정 설정</div>
               </Link>
             </div>
           )}
