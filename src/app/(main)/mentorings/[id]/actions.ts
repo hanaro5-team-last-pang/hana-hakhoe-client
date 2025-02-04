@@ -1,9 +1,9 @@
 'use server';
 
 import { LectureType } from '@/app/(main)/mentorings/type';
-import { BASE_HEADERS, BASE_URL } from '@/constant';
 import { ActionResType } from '@/types/hanaHakdang';
 import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
+import { fetcher } from '@/utils/fetcher';
 import { notFound } from 'next/navigation';
 
 /**
@@ -13,42 +13,35 @@ import { notFound } from 'next/navigation';
 export async function enrollLecture(
   lectureId: number
 ): Promise<ActionResType<LectureType, string>> {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
+  const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const res = await fetch(BASE_URL + `/lectures/${lectureId}/enroll`, {
-    method: 'POST',
-    headers: {
-      ...BASE_HEADERS,
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
+  const res = await fetcher('POST', `/lectures/${lectureId}/enroll`, {
+    jwt: accessJwtCookie.value,
   });
 
   if (!res.ok) {
     notFound();
   }
-
   const result = await res.json();
   return result.message;
 }
 
 export async function withdrawLecture(
-  lectureId: number
+  enrollmentId: number
 ): Promise<ActionResType<LectureType, string>> {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
+  const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const res = await fetch(BASE_URL + `/lectures/${lectureId}/enroll`, {
-    method: 'DELETE',
-    headers: {
-      ...BASE_HEADERS,
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
-  });
+  const res = await fetcher(
+    'DELETE',
+    `/lectures/${enrollmentId}/enroll-withdraw`,
+    {
+      jwt: accessJwtCookie.value,
+    }
+  );
 
   if (!res.ok) {
     notFound();
   }
-
   const result = await res.json();
-
   return result.result;
 }

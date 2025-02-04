@@ -1,6 +1,6 @@
 import { BASE_HEADERS, BASE_URL } from '@/constant';
 
-type Method = 'POST' | 'GET' | 'PATCH';
+type Method = 'POST' | 'GET' | 'PATCH' | 'DELETE';
 
 type Option = {
   body?: BodyInit;

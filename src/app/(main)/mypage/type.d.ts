@@ -16,27 +16,28 @@ type lectureValueType = {
   endTime: string;
 };
 
-export type MenteeMentoringsResType = {
+export type MenteeMentoringResType = {
   totalCount: number;
-  enrollmentList: MenteeMentoringsType[];
+  enrollmentList: MenteeMentoringType[];
 };
 
-export type MenteeMentoringsType = {
-  classroomId;
-  lectureId;
-  mentorId;
-  mentorName;
-  title;
-  startTime;
-  endTime;
-  isEnrollmentCanceled;
-  isDone;
-  isLectureCanceled;
-  possibleToEnter;
+export type MenteeMentoringType = {
+  classroomId: number;
+  lectureId: number;
+  mentorId: number;
+  mentorName: string;
+  title: string;
+  startTime: string;
+  endTime: string;
+  isEnrollmentCanceled: boolean;
+  isDone: boolean;
+  isLectureCanceled: boolean;
+  possibleToEnter: boolean;
 };
 
 export type MentoringTableType = {
   title: string;
+  mentorName?: string;
   start_date: string;
   status: string;
 };
