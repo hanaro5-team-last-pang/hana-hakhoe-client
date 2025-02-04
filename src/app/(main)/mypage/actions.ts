@@ -92,6 +92,7 @@ export async function openMentoring(
   const res = await fetcher('POST', '/lectures/register', {
     jwt: accessJwtCookie.value,
     body: JSON.stringify(formDataForSubmission),
+    header: {},
   });
 
   const responseData = await res.json();
