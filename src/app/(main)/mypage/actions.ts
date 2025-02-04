@@ -90,12 +90,9 @@ export async function openMentoring(
 
   console.log('🚀 Sending FormData:', formDataForSubmission);
 
-  const res = await fetch(`${BASE_URL}/lectures/register`, {
-    method: 'POST',
-    headers: {
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
-    body: formDataForSubmission,
+  const res = await fetcher('POST', '/lectures/register', {
+    jwt: accessJwtCookie.value,
+    body: JSON.stringify(formDataForSubmission),
   });
 
   const responseData = await res.json();
@@ -108,33 +105,15 @@ export async function openMentoring(
   }
 
   redirect('/mypage/mentorings');
-
-  console.log(value);
-  const res = await fetcher('POST', '/lectures/register', {
-    body: JSON.stringify(value),
-    jwt: accessJwtCookie.value,
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
-    console.log(data.message);
-  }
-
-  console.log(data);
-  redirect('/mypage/mentorings');
 }
 
 //멘티의 멘토링 수강 신청 조회 : 시작 전
 export async function getMentoringsForMentee(): Promise<MenteeMentoringsResType> {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
-
   const page = 0; // 원하는 페이지 값
+  const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const res = await fetch(`${BASE_URL}/lectures/queue/mentee?page=${page}`, {
-    method: 'GET',
-    headers: {
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
+  const res = await fetcher('GET', `/lectures/queue/mentee?page=${page}`, {
+    jwt: accessJwtCookie.name,
   });
 
   const data = (await res.json()) as BaseResType<MenteeMentoringsResType>;
@@ -143,15 +122,11 @@ export async function getMentoringsForMentee(): Promise<MenteeMentoringsResType>
 
 //멘티의 멘토링 수강 신청 조회 : 완료 기록
 export async function getMentoringsHistory(): Promise<MenteeMentoringsResType> {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
-
   const page = 0; // 원하는 페이지 값 받아오기
+  const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const res = await fetch(`${BASE_URL}/lectures/history/mentee?page=${page}`, {
-    method: 'GET',
-    headers: {
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
+  const res = await fetcher('GET', `/lectures/history/mentee?page=${page}`, {
+    jwt: accessJwtCookie.name,
   });
 
   const data = (await res.json()) as BaseResType<MenteeMentoringsResType>;

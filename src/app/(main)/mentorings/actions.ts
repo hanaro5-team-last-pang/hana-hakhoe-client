@@ -15,16 +15,11 @@ import { notFound } from 'next/navigation';
 
 //전체 멘토링 조회
 export async function getLectureList() {
-  const accessJwtCookie = await checkAuthAndGetCookie();
-
-  const res = await fetcher('GET', '/lectures', {
-    jwt: accessJwtCookie.value,
-  });
+  const res = await fetcher('GET', '/lectures');
 
   if (!res.ok) {
     notFound();
   }
-
   const data = (await res.json()) as BaseResType<LectureListResponse>;
   return data.result.lectureList;
 }
@@ -47,32 +42,22 @@ export async function getLectureSearch() {
 
 //멘토링 상세 정보
 export async function getLectureData(lectureId: number) {
-  const accessJwtCookie = await checkAuthAndGetCookie();
-
-  const res = await fetcher('GET', `/lectures/${lectureId}`, {
-    jwt: accessJwtCookie.value,
-  });
+  const res = await fetcher('GET', `/lectures/${lectureId}`);
 
   if (!res.ok) {
     notFound();
   }
-
   const data = (await res.json()) as BaseResType<LectureType>;
   return data.result;
 }
 
 //멘토링 상세 - 멘토 소개
 export async function getProfileCard(lectureId: number) {
-  const accessJwtCookie = await checkAuthAndGetCookie();
-
-  const res = await fetcher('GET', `/profile-card/${lectureId}`, {
-    jwt: accessJwtCookie.name,
-  });
+  const res = await fetcher('GET', `/profile-card/${lectureId}`);
 
   if (!res.ok) {
     notFound();
   }
-
   const data = (await res.json()) as BaseResType<ProfileResponseType>;
   return data.result;
 }
@@ -85,21 +70,13 @@ export async function getProfileCard(lectureId: number) {
 export async function getLectureReviews(
   lectureId: number
 ): Promise<BaseResType<ReviewPageResponseType>> {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
-
-  const res = await fetch(BASE_URL + `/lectures/reviews/${lectureId}`, {
-    method: 'GET',
-    headers: {
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
-  });
+  const res = await fetcher('GET', `/lectures/reviews/${lectureId}`);
 
   if (!res.ok) {
     notFound();
   }
-
-  const result = (await res.json()) as BaseResType<ReviewPageResponseType>;
-  return result;
+  const data = await res.json();
+  return data.result;
 }
 
 /**
@@ -107,21 +84,12 @@ export async function getLectureReviews(
  * @param lectureId
  */
 export async function getLectureFaqs(lectureId: number) {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
-
-  const res = await fetch(BASE_URL + `/faq/${lectureId}`, {
-    method: 'GET',
-    headers: {
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
-  });
+  const res = await fetcher('GET', `/faq/${lectureId}`);
 
   if (!res.ok) {
     notFound();
   }
-
-  const result: BaseResType<FaqResponseType[]> = await res.json();
-
+  const result = (await res.json()) as BaseResType<FaqResponseType[]>;
   return result.result;
 }
 
@@ -132,14 +100,10 @@ export async function postFaq(
   const question = formData.get('content') as string;
   const lectureId = formData.get('lectureId') as string;
 
-  const jsessionIdCookie = await checkAuthAndGetCookie();
+  const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const res = await fetch(BASE_URL + `lectures/faq/${lectureId}`, {
-    method: 'POST',
-    headers: {
-      ...BASE_HEADERS,
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
+  const res = await fetcher('GET', `lectures/faq/${lectureId}`, {
+    jwt: accessJwtCookie.name,
     body: JSON.stringify({ content: question }),
   });
 
@@ -155,21 +119,16 @@ export async function postFaq(
 export async function deleteFaq(
   faqId: number
 ): Promise<ActionResType<FaqFormType, string>> {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
+  const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const res = await fetch(BASE_URL + `/faq/${faqId}`, {
-    method: 'DELETE',
-    headers: {
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
+  const res = await fetcher('GET', `/faq/${faqId}`, {
+    jwt: accessJwtCookie.name,
   });
 
   if (!res.ok) {
     notFound();
   }
-
   const result = await res.json();
-
   return result.result;
 }
 

@@ -10,11 +10,13 @@ export async function GET() {
     return new Response();
   }
 
+  const accessToken = sessionCookie.value;
+
   const res = await fetch(BASE_URL + '/user-info', {
     method: 'GET',
     headers: {
       ...BASE_HEADERS,
-      Cookie: `${sessionCookie.name}=${sessionCookie.value}`,
+      Authorization: `Bearer ${accessToken}`,
     },
   });
 

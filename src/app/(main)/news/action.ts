@@ -1,11 +1,10 @@
 'use server';
 
 import { NewsType } from '@/app/(main)/news/type';
-import { BaseResType } from '@/types/hanaHakdang';
 import { fetcher } from '@/utils/fetcher';
 
 export async function getNewsData(retry = 1): Promise<NewsType[]> {
-  const res = await fetcher('GET', '/news');
+  const res = await fetcher('GET', `/news`);
 
   if (!res.ok) {
     console.log('No news data found. Requesting crawling...');
@@ -26,15 +25,7 @@ export async function getNewsData(retry = 1): Promise<NewsType[]> {
 }
 
 export async function requestCrawling(): Promise<void> {
-  const jsessionIdCookie = await checkAuthAndGetCookie();
-
-  const res = await fetch(BASE_URL + '/news/request-crawling', {
-    method: 'POST',
-    headers: {
-      ...BASE_HEADERS,
-      Cookie: `${jsessionIdCookie?.name}=${jsessionIdCookie?.value}`,
-    },
-  });
+  const res = await fetcher('POST', '/news/request-crawling');
 
   if (!res.ok) {
     console.error('Crawling request failed:', res.statusText);
