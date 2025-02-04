@@ -58,8 +58,7 @@ export default class RemotePeerConnection {
     try {
       await this._pConn.addIceCandidate(candidate);
     } catch {
-      console.error = () => {};
-      throw new Error('');
+      /* empty */
     }
   }
 
@@ -89,16 +88,7 @@ export default class RemotePeerConnection {
     this._pConn.addEventListener('track', async (e) => {
       if (!videoElement.srcObject) {
         videoElement.srcObject = e.streams[0];
-        try {
-          await Promise.race([
-            videoElement.play(),
-            new Promise((_, reject) =>
-              setTimeout(() => reject(new Error('play error')), 3000)
-            ),
-          ]);
-        } catch {
-          console.error('error');
-        }
+        await videoElement.play();
       }
     });
   }
