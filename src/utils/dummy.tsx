@@ -10,33 +10,38 @@ import {
 export const iconButtonData = [
   {
     icon: <FaBook />,
-    label: '디지털 교육',
+    label: '금융 상품',
+    value: 'FINANCIAL_PRODUCTS',
     count: 38,
+    route: '/financial_products',
+  },
+  {
+    icon: <FaChalkboardTeacher />,
+    label: '디지털 교육',
+    value: 'DIGITAL_EDUCATION',
+    count: 12,
     route: '/digital-education',
   },
   {
     icon: <FaGraduationCap />,
-    label: '은퇴 설계',
-    count: 28,
-    route: '/exercise-design',
-  },
-  {
-    icon: <FaChalkboardTeacher />,
-    label: '주식 · 투자',
-    count: 42,
-    route: '/stock-investment',
-  },
-  {
-    icon: <FaClipboardList />,
-    label: '대출',
-    count: 22,
-    route: '/performance-management',
+    label: '부동산', // category[2]
+    value: 'REAL_ESTATE',
+    count: 14,
+    route: '/real-estate',
   },
   {
     icon: <FaUsers />,
-    label: '상속',
+    label: '상속', // category[4]
+    value: 'INHERITANCE',
+    count: 7,
+    route: '/inheritance',
+  },
+  {
+    icon: <FaClipboardList />,
+    label: '은퇴 설계', // category[5]
+    value: 'RETIREMENT_DESIGN',
     count: 15,
-    route: '/mentoring',
+    route: '/retirement-design',
   },
 ];
 
