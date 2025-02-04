@@ -29,6 +29,7 @@ const usePeerConnections = (
       { local: LocalPeerConnection | null; remote: RemotePeerConnection | null }
     >
   >(new Map());
+  let newUserId: string | null = null;
 
   const setupIceCandidateHandling = (
     peerConnection: LocalPeerConnection | RemotePeerConnection,
@@ -42,13 +43,24 @@ const usePeerConnections = (
   const createVideoElement = (id: string) => {
     const videoElement = document.createElement('video');
     videoElement.id = id;
-    videoElement.className = 'w-full h-full rounded-xl object-cover';
+    videoElement.className = 'w-full aspect-[16/9] rounded object-cover';
     videoElement.setAttribute('autoPlay', 'true');
     videoElement.setAttribute('playsInline', 'true');
 
     document
       .getElementById('remote-video-container')
       ?.appendChild(videoElement);
+    return videoElement;
+  };
+
+  const createStartScreenVideoElement = (id: string) => {
+    const videoElement = document.createElement('video');
+    videoElement.id = id;
+    videoElement.className = 'w-full aspect-[16/9] rounded object-cover';
+    videoElement.setAttribute('autoPlay', 'true');
+    videoElement.setAttribute('playsInline', 'true');
+
+    document.getElementById('mentor-screen-video')?.appendChild(videoElement);
     return videoElement;
   };
 
@@ -63,7 +75,11 @@ const usePeerConnections = (
     return peerConnection;
   };
 
-  const handleLocalPeer = async (userId: string, remoteId?: string) => {
+  const handleLocalPeer = async (
+    userId: string,
+    remoteId?: string,
+    connectionFailureId?: string
+  ) => {
     const key = userId;
     const localPeerConnection = initializePeerConnection(
       key,
@@ -75,7 +91,8 @@ const usePeerConnections = (
     await localPeerConnection.sendOffer(
       (offer) => publish(SIGNALING_PUBLISH_URL(classroomId), offer),
       key,
-      remoteId
+      remoteId,
+      connectionFailureId
     );
   };
 
@@ -116,23 +133,38 @@ const usePeerConnections = (
       });
 
       subscribe(SIGNALING_SUBSCRIBE_URL(classroomId), async (message) => {
-        const { peerId, remoteId, description } = JSON.parse(
-          JSON.parse(message.body)
-        );
+        const { peerId, remoteId, connectionFailureId, description } =
+          JSON.parse(JSON.parse(message.body));
         if (description.type === 'offer') {
           let remotePeerConnection = pcListMap.get(peerId)?.remote;
 
           if (remoteId) {
-            if (remoteId === userId) {
+            if (remoteId === userId || remoteId === newUserId) {
+              if (connectionFailureId) {
+                pcListMap.get(connectionFailureId)?.remote?.close();
+                pcListMap.delete(connectionFailureId);
+                const element = document.getElementById(connectionFailureId);
+                if (element instanceof HTMLVideoElement && element.parentNode) {
+                  element.parentNode.removeChild(element);
+                }
+              }
               if (!remotePeerConnection) {
                 if (!pcListMap.has(peerId)) {
                   remotePeerConnection = initializePeerConnection(
                     peerId,
                     false
                   ) as RemotePeerConnection;
-                  const videoElement = createVideoElement(`video-${peerId}`);
 
-                  remotePeerConnection.addRemoteTrack(videoElement);
+                  if (String(peerId).includes('screen')) {
+                    remotePeerConnection.addRemoteTrack(
+                      createStartScreenVideoElement(peerId)
+                    );
+                  } else {
+                    remotePeerConnection.addRemoteTrack(
+                      createVideoElement(`video-${peerId}`)
+                    );
+                    newUserId = peerId;
+                  }
                   pcListMap.set(peerId, {
                     local: null,
                     remote: remotePeerConnection,
@@ -164,7 +196,7 @@ const usePeerConnections = (
           if (localPeerConnection.remotePeerId) {
             if (localPeerConnection.remotePeerId !== remoteId) {
               const newLocalPeerId = uuidv4();
-              await handleLocalPeer(newLocalPeerId, remoteId);
+              await handleLocalPeer(newLocalPeerId, remoteId, peerId);
             }
             return;
           }
@@ -192,41 +224,68 @@ const usePeerConnections = (
     try {
       const screenStream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
-        audio: true,
-      });
-      pcListMap.forEach(({ local, remote }) => {
-        const videoSender =
-          local
-            ?._pConn!.getSenders()
-            .find((sender) => sender.track?.kind === 'video') ||
-          remote
-            ?._pConn!.getSenders()
-            .find((sender) => sender.track?.kind === 'video');
-        if (videoSender)
-          videoSender.replaceTrack(screenStream.getVideoTracks()[0]);
+        audio: false,
       });
 
-      screenStream.getVideoTracks()[0].onended = async () => {
+      const screenPeerIds: string[] = [];
+
+      for (const [key, { remote }] of pcListMap) {
+        if (!remote || !remote.remotePeerId) continue;
+
+        const screenPeerId = `${remote.remotePeerId}-screen`;
+        if (pcListMap.has(screenPeerId)) continue;
+
+        const iceServers = [{ urls: 'stun:hanahakhoe.shop:3478' }];
+        const localPeerConnection = new LocalPeerConnection();
+        localPeerConnection.initPeerConnection({ iceServers });
+        localPeerConnection.addLocalTrack(screenStream);
+        setupIceCandidateHandling(localPeerConnection, screenPeerId);
+        const videoElement = document.createElement('video');
+        localPeerConnection.addRemoteTrack(videoElement);
+        pcListMap.set(screenPeerId, {
+          local: localPeerConnection,
+          remote: null,
+        });
+
+        await localPeerConnection.sendOffer(
+          (offer) => publish(SIGNALING_PUBLISH_URL(classroomId), offer),
+          screenPeerId,
+          remote.remotePeerId
+        );
+
+        screenPeerIds.push(screenPeerId);
+      }
+
+      const myScreenContainer = document.getElementById('my-screen-video');
+      if (myScreenContainer) {
+        const myScreenVideo = document.createElement('video');
+        myScreenVideo.id = 'my-screen-video-element';
+        myScreenVideo.srcObject = screenStream;
+        myScreenVideo.autoplay = true;
+        myScreenVideo.playsInline = true;
+        myScreenVideo.className = 'w-full h-full rounded object-cover';
+
+        myScreenContainer.innerHTML = '';
+        myScreenContainer.appendChild(myScreenVideo);
+      }
+
+      screenStream.getVideoTracks()[0].onended = () => {
         screenStream.getTracks().forEach((track) => track.stop());
-        const userStream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true,
-        });
 
-        pcListMap.forEach(({ local, remote }) => {
-          const videoSender =
-            local
-              ?._pConn!.getSenders()
-              .find((sender) => sender.track?.kind === 'video') ||
-            remote
-              ?._pConn!.getSenders()
-              .find((sender) => sender.track?.kind === 'video');
-          if (videoSender)
-            videoSender.replaceTrack(userStream.getVideoTracks()[0]);
-        });
+        for (const screenPeerId of screenPeerIds) {
+          const videoElement = document.getElementById(screenPeerId);
+          videoElement?.remove();
+
+          const peerObj = pcListMap.get(screenPeerId);
+          peerObj?.remote?.close();
+          pcListMap.delete(screenPeerId);
+        }
+
+        const myScreenContainer = document.getElementById('my-screen-video');
+        if (myScreenContainer) myScreenContainer.innerHTML = '';
       };
     } catch (error) {
-      console.error(error);
+      console.error('Screen sharing failed:', error);
     }
   };
 
@@ -237,11 +296,7 @@ const usePeerConnections = (
       remote?.close();
     });
     pcListMap.clear();
-    router.push(`/mentorings/${classroomId}`);
   };
-
-  const getGridSize = () =>
-    pcListMap.size > 3 ? 'grid-cols-3 grid-rows-3' : 'grid-cols-2 grid-rows-2';
 
   return {
     subscribeEnter,
@@ -249,7 +304,6 @@ const usePeerConnections = (
     handleRemotePeer,
     closeClassroom,
     startScreenStream,
-    getGridSize,
   };
 };
 

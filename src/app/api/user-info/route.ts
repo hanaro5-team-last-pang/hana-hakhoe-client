@@ -6,7 +6,6 @@ import { cookies } from 'next/headers';
 export async function GET() {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME);
-
   if (!sessionCookie) {
     return new Response();
   }
