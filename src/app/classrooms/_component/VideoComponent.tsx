@@ -26,7 +26,7 @@ export default function VideoComponent({ classroomId }: Props) {
   const isConnected = useContext(StompIsConnectedContext);
   const publish = useContext(StompPublishContext);
   const { subscribeEnter, closeClassroom, startScreenStream, getGridSize } =
-    usePeerConnections(classroomId, stream!, router, auth!);
+    usePeerConnections(classroomId, stream!, router);
 
   useEffect(() => {
     if (isConnected && stream && auth!) {
