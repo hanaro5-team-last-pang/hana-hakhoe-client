@@ -55,8 +55,11 @@ export default class RemotePeerConnection {
     if (!this._pConn) {
       throw new Error('원격 연결을 찾을 수 없습니다.');
     }
-    if (this._pConn.remoteDescription) {
+    try {
       await this._pConn.addIceCandidate(candidate);
+    } catch {
+      console.error = () => {};
+      throw new Error('');
     }
   }
 
@@ -90,7 +93,7 @@ export default class RemotePeerConnection {
           await Promise.race([
             videoElement.play(),
             new Promise((_, reject) =>
-              setTimeout(() => reject(new Error('play error')), 8000)
+              setTimeout(() => reject(new Error('play error')), 3000)
             ),
           ]);
         } catch {
