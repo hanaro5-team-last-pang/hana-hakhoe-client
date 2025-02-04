@@ -10,7 +10,6 @@ import {
   StompPublishContext,
   StompSubscribeContext,
 } from '@/context/StompConnectionContext';
-import { AuthType } from '@/types/hanaHakdang';
 import LocalPeerConnection from '@/webrtc/LocalPeerConnection';
 import RemotePeerConnection from '@/webrtc/RemotePeerConnection';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,8 +19,7 @@ import { useState, useContext, useCallback } from 'react';
 const usePeerConnections = (
   classroomId: bigint,
   stream: MediaStream,
-  router: AppRouterInstance,
-  auth: AuthType
+  router: AppRouterInstance
 ) => {
   const publish = useContext(StompPublishContext);
   const subscribe = useContext(StompSubscribeContext);
