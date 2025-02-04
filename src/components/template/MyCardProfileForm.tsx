@@ -72,7 +72,7 @@ export default function MyCardProfileForm({
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center">
       {!modifyMode ? (
         <div className="relative w-64 h-64 my-4">
           <Image
