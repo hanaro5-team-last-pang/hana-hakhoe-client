@@ -1,24 +1,26 @@
 'use client';
 
+import { getCategory } from '@/app/(main)/mentorings/actions';
+import { Category } from '@/app/(main)/mentorings/type';
 import { openMentoring } from '@/app/(main)/mypage/actions';
 import Button from '@/components/atoms/Button';
 import Input from '@/components/atoms/Input';
-import CheckboxList from '@/components/molecules/CheckboxList';
-import { category, tags } from '@/utils/dummy';
+import { ActionResType } from '@/types/hanaHakdang';
+import { tags } from '@/utils/dummy';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { toast } from 'react-toastify';
 import Image from 'next/image';
-import { useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export default function OpenMentoringForm() {
+  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
-  const [image, setImage] = useState<File | null>(null);
-  const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const categoryRef = useRef<HTMLSelectElement>(null);
   const maxParticipantsRef = useRef<HTMLSelectElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
@@ -26,11 +28,23 @@ export default function OpenMentoringForm() {
   const endTimeRef = useRef<HTMLInputElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
+  const selectedTagsRef = useRef<Set<number>>(new Set());
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [image, setImage] = useState<File | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFile = e.target.files[0];
       setImage(selectedFile);
+    }
+  };
+
+  const handleTagChange = (id: number) => {
+    if (selectedTagsRef.current.has(id)) {
+      selectedTagsRef.current.delete(id);
+    } else {
+      selectedTagsRef.current.add(id);
     }
   };
 
@@ -60,7 +74,7 @@ export default function OpenMentoringForm() {
       !dateRef.current?.value ||
       !startTimeRef.current?.value ||
       !endTimeRef.current?.value ||
-      selectedTags.length === 0
+      selectedTagsRef.current.size === 0
     ) {
       toast.info('모든 정보를 입력해주세요');
       return;
@@ -88,16 +102,26 @@ export default function OpenMentoringForm() {
     formData.append('end_time', selectedEndTime);
     formData.append('max_participants', maxParticipantsRef.current.value);
     formData.append('category', categoryRef.current.value);
-    selectedTags.forEach((tag) => formData.append('tags', tag.toString()));
+    selectedTagsRef.current.forEach((tag) =>
+      formData.append('tags', tag.toString())
+    );
 
-    try {
-      await openMentoring(formData);
-      toast.success('멘토링 등록에 성공했습니다!');
-    } catch (error) {
-      console.error('멘토링 등록 실패:', error);
-      toast.error('멘토링 등록에 실패했습니다.');
+    const result: ActionResType<string, string> = await openMentoring(formData);
+    if (result.isError) {
+      toast.error(result.message);
+    } else {
+      toast.success(result.message);
+      router.push('/mypage/mentorings');
     }
   };
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const data = await getCategory();
+      setCategories(data.categories);
+    }
+    fetchCategories();
+  }, []);
 
   return (
     <form
@@ -116,9 +140,9 @@ export default function OpenMentoringForm() {
                 ref={categoryRef}
               >
                 <option value="">선택하세요</option>
-                {category.map((cat) => (
-                  <option key={cat.id} value={cat.value}>
-                    {cat.label}
+                {categories.map((cat, index) => (
+                  <option key={index} value={cat.tag}>
+                    {cat.name}
                   </option>
                 ))}
               </select>
@@ -191,12 +215,21 @@ export default function OpenMentoringForm() {
 
           {/* 태그 입력 */}
           <h3>태그 선택하기</h3>
-          <CheckboxList
-            items={tags}
-            selectedTags={selectedTags}
-            onChange={setSelectedTags}
-            className="flex-wrap gap-5"
-          />
+          <div className="flex gap-4">
+            {tags.map((tag) => (
+              <div key={tag.id} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`tag-${tag.id}`}
+                  onChange={() => handleTagChange(tag.id)}
+                  className="mr-3"
+                />
+                <label htmlFor={`tag-${tag.id}`} className="cursor-pointer">
+                  {tag.label}
+                </label>
+              </div>
+            ))}
+          </div>
 
           {/* 이미지 업로드 */}
           <div className="flex flex-col items-start rounded-2xl border border-gray-400 w-full p-4 my-4">
