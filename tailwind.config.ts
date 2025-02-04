@@ -27,6 +27,7 @@ export default {
         hanaGreen40: '#D9E9E6',
         hanaGreen20: '#F5F9F8',
 
+        ourWhite: '#F4F4F4',
         ourGreen: '#0B9B97',
         ourLightGreen: '#C1EBE9',
         ourOrange: '#FF782D',

@@ -19,14 +19,14 @@ export type AuthType = {
 };
 
 export type ChatResponseType = {
-  readonly userId: number;
+  readonly userId: string;
   readonly username: string;
   readonly body: string;
   readonly timestamp: string;
 };
 
 export type ChatRequestType = {
-  userId: number;
+  userId: string;
   username: string;
   lectureId: number;
   body: string;

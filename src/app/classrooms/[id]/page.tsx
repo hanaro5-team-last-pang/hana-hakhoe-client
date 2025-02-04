@@ -33,7 +33,7 @@ export default async function Page(props: { params: Params }) {
           </div>
         </div>
       </div>
-      <div className="relative grid grid-rows-[1fr_12fr] h-full border-r-4 border-gray-300 min-h-0">
+      <div className="relative grid grid-rows-[1fr_12fr] h-full lg:border-r-4 border-gray-300 min-h-0">
         <div className="border-b-4 border-gray-300 flex items-center">
           <Link
             className="p-2 rounded-lg bg-green-700 mx-3"
@@ -45,7 +45,7 @@ export default async function Page(props: { params: Params }) {
         </div>
         <VideoComponent classroomId={classroomId} />
       </div>
-      <div className="p-4 hidden lg:block relative overflow-y-auto">
+      <div className="p-4 relative overflow-y-auto">
         <ChatComponent classroomId={classroomId} />
       </div>
     </>
