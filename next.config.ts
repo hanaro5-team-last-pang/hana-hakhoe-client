@@ -1,3 +1,4 @@
+import { SESSION_COOKIE_NAME } from '@/constant';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
@@ -20,7 +21,27 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'cdn.fetimes.co.kr',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.gravatar.com',
+      },
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: '/mypage/:path*',
+        missing: [{ type: 'cookie', key: 'access' }],
+        permanent: false,
+        destination: '/login',
+      },
+      {
+        source: '/classrooms/:path*',
+        missing: [{ type: 'cookie', key: 'access' }],
+        permanent: false,
+        destination: '/login',
+      },
+    ];
   },
 };
 

@@ -1,6 +1,5 @@
 import { getNewsData } from '@/app/(main)/news/action';
 import CardView from '@/components/organisms/CardView';
-import SearchBar from '@/components/template/SearchBar';
 import dayjs from 'dayjs';
 
 export default async function Page() {

@@ -7,18 +7,11 @@ import { useAuthStore } from '@/context/AuthContext';
 import { AiFillEye } from 'react-icons/ai';
 import { toast } from 'react-toastify';
 import Image from 'next/image';
-import {
-  ChangeEvent,
-  useActionState,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { ChangeEvent, useActionState, useEffect, useState } from 'react';
 
 export default function Page() {
   const { auth, loading, fetchAuth } = useAuthStore((state) => state);
   const [hide, setHide] = useState(false);
-  const birthDateRef = useRef('2024년 10월 10일');
   const [showNewImage, setShowNewImage] = useState<string | null>(null);
   const [newImage, setNewImage] = useState<File | null>(null);
   const [state, formAction] = useActionState(changeProfileForm, {
@@ -99,7 +92,7 @@ export default function Page() {
       ) : (
         <>
           <div>{auth.name}</div>
-          <div>{birthDateRef.current}</div>
+          <div>{auth.birth}</div>
         </>
       )}
       <hr className="border-t border-gray-300" />

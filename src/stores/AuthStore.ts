@@ -1,5 +1,6 @@
 import { DEFAULT_PROFILE_URL } from '@/constant';
 import { AuthType, BaseResType } from '@/types/hanaHakdang';
+import sha256 from 'crypto-js/sha256';
 import { createStore } from 'zustand/vanilla';
 
 type AuthResType = {
@@ -41,7 +42,9 @@ export const createAuthStore = (initState: AuthState = defaultInitState) => {
         set({
           auth: {
             ...auth,
-            profileImage: auth.profileImageUrl ?? DEFAULT_PROFILE_URL,
+            profileImage:
+              auth.profileImageUrl ??
+              `${DEFAULT_PROFILE_URL}/${sha256(auth.name)}?s=32&d=identicon&r=PG`,
             birth: auth.birthDate,
           },
         });

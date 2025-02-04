@@ -111,5 +111,9 @@ export default function HeaderTab() {
     };
   }, []);
 
+  if (!auth) {
+    tabList.pop();
+  }
+
   return <Tab tabList={tabList} />;
 }
