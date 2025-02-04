@@ -16,6 +16,11 @@ const nextConfig: NextConfig = {
         hostname: 'lastpang-file-bucket.s3.ap-northeast-2.amazonaws.com',
         port: '',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.fetimes.co.kr',
+        port: '',
+      },
     ],
   },
 };

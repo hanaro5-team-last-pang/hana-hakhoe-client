@@ -36,8 +36,15 @@ export default function CardView({
   date,
   description,
 }: CardViewProps) {
+  //뉴스 카드는 새창에서 열기 설정
+  const isExternalLink = id.startsWith('http://') || id.startsWith('https://');
+
   return (
-    <Link href={id}>
+    <Link
+      href={id}
+      target={isExternalLink ? '_blank' : undefined}
+      rel={isExternalLink ? 'noopener noreferrer' : undefined}
+    >
       <div
         className="flex flex-col rounded-2xl overflow-hidden border-gray-200 border-[0.5px] shadow-md w-full
       transition-transform duration-300 ease-in-out transform hover:-translate-y-3 hover:shadow-lg cursor-pointer"
@@ -79,7 +86,11 @@ export default function CardView({
             </div>
           )}
 
-          {description && <div className="text-gray-700">{description}</div>}
+          {description && (
+            <div className="text-gray-700 line-clamp-4 overflow-hidden overflow-ellipsis">
+              {description}
+            </div>
+          )}
 
           {start_time && (
             <div className="flex items-center mb-1">

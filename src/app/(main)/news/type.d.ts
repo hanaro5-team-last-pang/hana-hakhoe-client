@@ -4,5 +4,5 @@ export type NewsType = {
   content: string;
   newsUrl: string;
   newsThumbnailUrl: string;
-  createdAt: Date;
+  createdAt: string;
 };
