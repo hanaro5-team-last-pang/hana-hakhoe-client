@@ -97,8 +97,7 @@ export default class RemotePeerConnection {
             ),
           ]);
         } catch {
-          videoElement.remove();
-          this._pConn?.close();
+          console.error('error');
         }
       }
     });

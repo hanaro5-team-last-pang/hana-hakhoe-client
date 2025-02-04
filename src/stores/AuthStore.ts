@@ -4,7 +4,7 @@ import sha256 from 'crypto-js/sha256';
 import { createStore } from 'zustand/vanilla';
 
 type AuthResType = {
-  userId: number;
+  userId: string;
   name: string;
   role: 'MENTOR' | 'MENTEE';
   profileImageUrl?: string;

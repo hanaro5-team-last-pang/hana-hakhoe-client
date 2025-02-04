@@ -22,7 +22,8 @@ export default class LocalPeerConnection {
   public async sendOffer(
     sendFn: (text: string) => void,
     localPeerId: string,
-    remotePeerId?: string
+    remotePeerId?: string,
+    connectionFailureId?: string
   ) {
     if (!this._pConn) {
       throw new Error('로컬 연결을 찾을 수 없습니다.');
@@ -34,6 +35,7 @@ export default class LocalPeerConnection {
         peerId: localPeerId,
         description: offer,
         remoteId: remotePeerId,
+        connectionFailureId: connectionFailureId,
       };
       sendFn(JSON.stringify(offerSignal));
     } catch (error) {
