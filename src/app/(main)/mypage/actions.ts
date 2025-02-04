@@ -5,14 +5,16 @@ import {
   MentoringResponseType,
   ProfileRequestType,
   ProfileResponseType,
-  MenteeMentoringsResType,
+  MenteeMentoringResType,
 } from '@/app/(main)/mypage/type';
-import { AccountType, ActionResType, BaseResType } from '@/types/hanaHakdang';
+import { ActionResType, BaseResType } from '@/types/hanaHakdang';
 import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
 import { fetcher } from '@/utils/fetcher';
 import { redirect } from 'next/navigation';
 
-// 멘토의 멘토링 리스트 조회
+/**
+ * 멘토의 멘토링 리스트 조회
+ */
 export async function getMentorings(): Promise<MentoringResponseType> {
   const accessJwtCookie = await checkAuthAndGetCookie();
 
@@ -24,15 +26,9 @@ export async function getMentorings(): Promise<MentoringResponseType> {
   return data.result;
 }
 
-export async function getAccountData(): Promise<AccountType> {
-  return {
-    name: '중일',
-    birth: '2024년 10월 10일',
-    profileImage: 'https://placehold.co/25x25',
-  };
-}
-
-// 멘토의 명함 조회, 수정
+/**
+ * 멘토의 명함 조회, 수정
+ */
 export async function getProfile(): Promise<ProfileResponseType> {
   const accessJwtCookie = await checkAuthAndGetCookie();
 
@@ -65,7 +61,10 @@ export async function ModifyProfile(
   return data.message;
 }
 
-// 멘토링 등록
+/**
+ * 멘토링 등록
+ * @param formData
+ */
 export async function openMentoring(
   formData: FormData
 ): Promise<ActionResType<openMentoringFormType, string>> {
@@ -107,28 +106,27 @@ export async function openMentoring(
   redirect('/mypage/mentorings');
 }
 
-//멘티의 멘토링 수강 신청 조회 : 시작 전
-export async function getMentoringsForMentee(): Promise<MenteeMentoringsResType> {
-  const page = 0; // 원하는 페이지 값
+/**
+ * 멘티의 멘토링 수강 신청 조회 : 시작 전 & 수강 완료
+ */
+export async function getMentoringForMentee(): Promise<MenteeMentoringResType> {
   const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const res = await fetcher('GET', `/lectures/queue/mentee?page=${page}`, {
-    jwt: accessJwtCookie.name,
+  const res = await fetcher('GET', `/lectures/queue/mentee`, {
+    jwt: accessJwtCookie.value,
   });
 
-  const data = (await res.json()) as BaseResType<MenteeMentoringsResType>;
+  const data = await res.json();
   return data.result;
 }
 
-//멘티의 멘토링 수강 신청 조회 : 완료 기록
-export async function getMentoringsHistory(): Promise<MenteeMentoringsResType> {
-  const page = 0; // 원하는 페이지 값 받아오기
+export async function getMentoringHistory(): Promise<MenteeMentoringResType> {
   const accessJwtCookie = await checkAuthAndGetCookie();
 
-  const res = await fetcher('GET', `/lectures/history/mentee?page=${page}`, {
-    jwt: accessJwtCookie.name,
+  const res = await fetcher('GET', `/lectures/history/mentee`, {
+    jwt: accessJwtCookie.value,
   });
 
-  const data = (await res.json()) as BaseResType<MenteeMentoringsResType>;
+  const data = await res.json();
   return data.result;
 }

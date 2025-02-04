@@ -103,7 +103,7 @@ export async function postFaq(
   const accessJwtCookie = await checkAuthAndGetCookie();
 
   const res = await fetcher('GET', `lectures/faq/${lectureId}`, {
-    jwt: accessJwtCookie.name,
+    jwt: accessJwtCookie.value,
     body: JSON.stringify({ content: question }),
   });
 
