@@ -24,6 +24,7 @@ export default function MyCardCareerForm({
         <textarea
           className="text-md bg-inherit text-gray-700 px-2 my-3 w-full h-3/4 outline outline-2 outline-blue-400 focus:outline-blue-400 focus:outline-2"
           value={newCareer}
+          placeholder="멘토님의 경력을 소개해주세요"
           onChange={(e) => setNewCareer(e.target.value)}
         />
       )}

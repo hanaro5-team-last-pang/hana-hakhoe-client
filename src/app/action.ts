@@ -4,7 +4,6 @@ import {
   ActionResType,
   BaseResType,
   SubmitReviewFormType,
-  AuthType,
   ChangeProfileFormType,
 } from '@/types/hanaHakdang';
 import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
@@ -27,7 +26,6 @@ export async function changeProfileForm(
     newPassword: formData.get('newPassword') as string | null,
     newConfirmedPassword: formData.get('newConfirmedPassword') as string | null,
   };
-
   const reqFormData = new FormData();
   if (formObj.newImage) {
     reqFormData.append('imageFile', formObj.newImage);
@@ -90,19 +88,4 @@ export async function submitReview(
     message: message,
     isError: false,
   };
-}
-
-export async function getMyAuthData(): Promise<AuthType> {
-  const accessJwtCookie = await checkAuthAndGetCookie();
-
-  const res = await fetcher('GET', '/user-info', {
-    jwt: accessJwtCookie.value,
-  });
-
-  const data = (await res.json()) as BaseResType<AuthType>;
-  if (!res.ok) {
-    console.log(`Failed to fetch user info: ${data.message}`);
-  }
-
-  return data.result;
 }
