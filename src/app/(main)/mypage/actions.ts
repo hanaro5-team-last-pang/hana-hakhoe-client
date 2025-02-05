@@ -110,6 +110,23 @@ export async function openMentoring(
 }
 
 /**
+ * 멘토의 멘토링 삭제
+ */
+export async function withdrawMentorLecture(
+  lectureId: number
+): Promise<ActionResType<null, string>> {
+  const accessJwtCookie = await checkAuthAndGetCookie();
+
+  const res = await fetcher('DELETE', `/lectures/${lectureId}/withdraw`, {
+    jwt: accessJwtCookie.value,
+  });
+
+  const result = await res.json();
+  console.log(res);
+  return result.message;
+}
+
+/**
  * 멘티의 멘토링 수강 신청 조회 : 시작 전 & 수강 완료
  */
 export async function getMentoringForMentee(): Promise<MenteeMentoringResType> {

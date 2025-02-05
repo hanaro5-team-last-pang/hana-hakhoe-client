@@ -38,6 +38,7 @@ export type EnterClassroomResType = {
 export type MenteeMentoringType = {
   classroomId: string;
   lectureId: number;
+  enrollmentId: number;
   mentorId: number;
   mentorName: string;
   title: string;
@@ -78,9 +79,9 @@ export type InfoType = {
 export type ProfileResponseType = {
   mentor_name: string;
   profileImageUrl: string;
-  shortIntroduction: string;
-  simpleInfo: InfoType[];
-  detailInfo?: InfoType[];
+  short_introduction: string;
+  simple_info: InfoType[];
+  detail_info?: InfoType[];
 };
 
 export type ProfileRequestType = {

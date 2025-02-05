@@ -1,6 +1,8 @@
 'use client';
 
 // TODO: ag-grid 표 컴포넌트 상태 관리 필요할 시 변경 필요
+import { withdrawLecture } from '@/app/(main)/mentorings/[id]/actions';
+import { withdrawMentorLecture } from '@/app/(main)/mypage/actions';
 import { MentoringTableType } from '@/app/(main)/mypage/type';
 import Button from '@/components/atoms/Button';
 import MentoringListTableStatus from '@/components/organisms/MentoringListTableStatus';
@@ -13,11 +15,13 @@ import {
   ICellRendererParams,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
+import { toast } from 'react-toastify';
 import { redirect, useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
 interface Props {
   mentorings: MentoringTableType[];
+  histories: MentoringTableType[];
 }
 
 export default function MentoringListTable(props: Props) {
@@ -27,72 +31,89 @@ export default function MentoringListTable(props: Props) {
   const router = useRouter();
   ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
+  const handleWithdraw = async (enrollmentId: number) => {
+    try {
+      await withdrawLecture(enrollmentId);
+      toast.success('정상적으로 취소되었습니다.');
+    } catch {
+      toast.warn('수강 취소에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  const handleMentorWithdraw = async (lectureId: number) => {
+    try {
+      await withdrawMentorLecture(lectureId);
+      toast.success('정상적으로 삭제되었습니다.');
+    } catch {
+      toast.warn('삭제에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
   const colDefs: ColDef[] = [
     {
       field: 'title',
       headerName: '멘토링명',
-      width: 250, // 기본 너비 설정 (px 단위)
+      width: 220,
       minWidth: 210,
     },
     {
       field: 'start_date',
       headerName: '날짜',
-      width: 160, // 기본 너비 설정
+      width: 160,
       minWidth: 140,
     },
-    // 멘토일 경우 강사명 컬럼 제거
     ...(role === 'MENTOR'
       ? []
       : [
           {
             field: 'mentorName',
             headerName: '강사명',
-            width: 100,
+            width: 90,
             minWidth: 70,
           },
         ]),
     {
       field: 'status',
       headerName: '상태',
-      width: 120,
+      width: 110,
       minWidth: 110,
       cellRenderer: MentoringListTableStatus,
     },
-    // "강의실 입장" 또는 "리뷰 남기기" 컬럼 설정
     {
       field: 'class',
-      headerName: role === 'MENTOR' ? '강의 시작 상태' : '강의실',
-      width: 130,
+      headerName: role === 'MENTOR' ? '강의실 연결' : '강의실',
+      width: 110,
       minWidth: 110,
       cellRenderer: (params: ICellRendererParams) => {
-        const buttonText =
-          params.data.status === '수강 완료'
-            ? '리뷰 남기기'
-            : role === 'MENTOR'
-              ? '강의 시작'
-              : '강의실 입장';
+        const status = params.data.status;
 
-        return (
+        let buttonText = '';
+        if (status !== '취소됨') {
+          buttonText =
+            status === '수강 완료'
+              ? '리뷰 보기'
+              : role === 'MENTOR' && status === '완료'
+                ? '종료됨'
+                : '입장 시작';
+        }
+        return buttonText ? (
           <Button
             type="button"
-            text={`${buttonText}`}
-            className="bg-red-50 text-pink-900 rounded-lg p-2 text-xs font-fontMedium"
+            text={buttonText}
+            className="bg-blue-50 text-blue-900 rounded-lg p-2 text-xs font-fontMedium"
           />
-        );
+        ) : null;
       },
       onCellClicked: async (params) => {
-        if (params.data.status === '수강 완료') {
-          redirect(`/mentorings/${params.data.lectureId}`);
-        } else {
-          if (role === 'MENTOR') {
-            redirect(`/classrooms/${params.data.classroomId}`);
+        if (params.data.status !== '취소됨') {
+          if (params.data.status === '수강 완료') {
+            redirect(`/mentorings/${params.data.lectureId}`);
           } else {
             redirect(`/classrooms/${params.data.classroomId}`);
           }
         }
       },
     },
-    // 멘토일 때 "멘토링 삭제" 컬럼 추가
     ...(role === 'MENTOR'
       ? [
           {
@@ -100,12 +121,53 @@ export default function MentoringListTable(props: Props) {
             headerName: '멘토링 삭제',
             width: 130,
             minWidth: 110,
-            cellRenderer: 'buttonRenderer',
-            // deletelecture action 추가
+            cellRenderer: (params: ICellRendererParams) => {
+              if (params.data.status === '멘토 오픈 전') {
+                return (
+                  <button
+                    onClick={() => handleMentorWithdraw(params.data.lectureId)}
+                    className="bg-red-50 text-pink-900 rounded-lg p-2 text-xs font-fontMedium"
+                  >
+                    삭제하기
+                  </button>
+                );
+              }
+              return null;
+            },
           },
         ]
       : []),
-  ];
+    // Add "수강 취소" column
+    role === 'MENTEE' && {
+      field: 'withdraw',
+      headerName: '수강 취소',
+      width: 100,
+      minWidth: 90,
+      cellRenderer: (params: ICellRendererParams) => {
+        if (params.data.status === '시작 전') {
+          return (
+            <button
+              onClick={() => handleWithdraw(params.data.enrollmentId)}
+              className="bg-red-50 text-pink-900 rounded-lg p-2 text-xs font-fontMedium"
+            >
+              취소하기
+            </button>
+          );
+        }
+        if (
+          (params.data.isEnrollmentCanceled || params.data.isLecutrCanceled) ===
+          true
+        ) {
+          return (
+            <button className="bg-red-50 text-pink-900 rounded-lg p-2 text-xs font-fontMedium">
+              취소 완료
+            </button>
+          );
+        }
+        return null;
+      },
+    },
+  ].filter((column) => column !== false);
 
   const handleRowClick = useCallback(
     (event: RowClickedEvent) => {
