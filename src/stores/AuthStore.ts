@@ -37,8 +37,8 @@ export const createAuthStore = (initState: AuthState = defaultInitState) => {
         const res = await fetch('/api/user-info', {
           method: 'GET',
         });
-        const data = (await res.json()) as BaseResType<AuthResType>;
-        const auth = data.result;
+        const auth = (await res.json()) as AuthResType;
+        console.log(auth);
         set({
           auth: {
             ...auth,

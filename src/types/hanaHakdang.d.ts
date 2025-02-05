@@ -76,3 +76,11 @@ export type AccountType = {
 export type Jwt = {
   accessToken: string;
 };
+
+type AuthResType = {
+  userId: number;
+  name: string;
+  role: 'MENTOR' | 'MENTEE';
+  profileImageUrl?: string;
+  birthDate: string;
+};

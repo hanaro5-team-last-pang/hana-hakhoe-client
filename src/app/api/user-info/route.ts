@@ -1,4 +1,5 @@
 import { SESSION_COOKIE_NAME } from '@/constant';
+import { AuthResType, BaseResType } from '@/types/hanaHakdang';
 import { fetcher } from '@/utils/fetcher';
 import { cookies } from 'next/headers';
 
@@ -18,5 +19,11 @@ export async function GET() {
     return new Response();
   }
 
-  return Response.json(await res.json());
+  const data = (await res.json()) as BaseResType<AuthResType>;
+
+  return Response.json(data.result, {
+    headers: {
+      'Set-Cookie': `role=${data.result.role}; path=/`,
+    },
+  });
 }
