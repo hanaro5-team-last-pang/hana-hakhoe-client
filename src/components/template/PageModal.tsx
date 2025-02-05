@@ -6,9 +6,10 @@ import { ElementRef, ReactNode, useCallback, useEffect, useRef } from 'react';
 
 interface Props {
   children: ReactNode;
+  url?: string;
 }
 
-export default function PageModal({ children }: Props) {
+export default function PageModal({ children, url }: Props) {
   const router = useRouter();
   const dialogRef = useRef<ElementRef<'dialog'>>(null);
 
@@ -19,7 +20,11 @@ export default function PageModal({ children }: Props) {
   }, []);
 
   const onDismiss = useCallback(() => {
-    router.back();
+    if (url) {
+      router.push(url);
+    } else {
+      router.back();
+    }
   }, []);
 
   return createPortal(

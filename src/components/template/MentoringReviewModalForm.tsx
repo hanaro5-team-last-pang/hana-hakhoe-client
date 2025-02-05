@@ -5,33 +5,23 @@ import Button from '@/components/atoms/Button';
 import Carousel from '@/components/molecules/Carousel';
 import { CardType } from '@/types/hanaHakdang';
 import { Rating } from 'react-simple-star-rating';
-import { useActionState, useState, useRef } from 'react';
+import { useActionState, useState } from 'react';
 
 export default function MentoringReviewModalForm({
   lectureId,
 }: {
   lectureId: number;
 }) {
-  const [rating, setRating] = useState(0);
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
-
-  const [, formAction] = useActionState(postLectureReviews, {
+  const [score, setScore] = useState(0);
+  const [state, formAction] = useActionState(postLectureReviews, {
     value: {
       lectureId: lectureId,
-      score: rating || 0,
-      content: textAreaRef.current?.value || '',
+      score: 0,
+      content: '',
     },
     message: '후기 제출 전 폼',
     isError: false,
   });
-
-  const handleRating = (rate: number) => {
-    setRating(rate);
-  };
-
-  const onPointerMove = (value: number, index: number) => {
-    console.log(value, index);
-  };
 
   const items: CardType[] = [
     {
@@ -48,8 +38,14 @@ export default function MentoringReviewModalForm({
     },
   ];
 
+  const handleRating = (rate: number) => {
+    setScore(rate);
+  };
+
   return (
     <form action={formAction}>
+      <input type="hidden" name="lectureId" value={lectureId} />
+      <input type="hidden" name="score" value={score} />
       <div>
         <div className="text-center font-bold">멘토링에 대해</div>
         <div className="text-center font-bold">후기를 남겨주세요!</div>
@@ -58,7 +54,7 @@ export default function MentoringReviewModalForm({
             <div className="my-2 flex justify-center">
               <Rating
                 onClick={handleRating}
-                onPointerMove={onPointerMove}
+                initialValue={score}
                 transition
                 allowFraction
                 size={40}
@@ -66,7 +62,8 @@ export default function MentoringReviewModalForm({
               />
             </div>
             <textarea
-              ref={textAreaRef}
+              name="content"
+              defaultValue={state.value.content}
               className="w-full font-bold px-2 py-6 rounded-lg drop-shadow-lg text-gray-400 focus:outline-none resize-none text-left placeholder:text-center placeholder:text-gray-400 scrollbar-hide"
               placeholder={`멘토링 후기를 남겨주시면\n품질이 올라갑니다.`}
             ></textarea>
