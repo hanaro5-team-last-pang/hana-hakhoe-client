@@ -21,7 +21,7 @@ import {
 } from 'react';
 
 interface Props {
-  classroomId: bigint;
+  classroomId: string;
 }
 
 export default function ChatComponent({ classroomId }: Props) {

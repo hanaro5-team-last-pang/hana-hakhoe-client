@@ -21,7 +21,6 @@ export default function Page() {
       const fetchData = async () => {
         try {
           if (auth.role === 'MENTOR') {
-            // 멘토일 경우
             const result = await getMentorings();
 
             const mentorings = [
