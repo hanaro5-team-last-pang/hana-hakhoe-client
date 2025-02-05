@@ -144,7 +144,7 @@ export default function VideoComponent({ classroomId, mentorKey }: Props) {
                 <div className="mx-3 mt-2 font-bold">멘토</div>
                 <div
                   id="mentor-video-container"
-                  className="p-2 h-[20%] w-full relative"
+                  className="p-2 w-44 h-32 relative"
                 />
                 <div className="mx-3 font-bold">화면 공유</div>
                 <div className="flex-1 items-center justify-between w-full">
