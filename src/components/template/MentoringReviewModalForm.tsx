@@ -49,7 +49,7 @@ export default function MentoringReviewModalForm({
   ];
 
   return (
-    <form onSubmit={formAction}>
+    <form action={formAction}>
       <div>
         <div className="text-center font-bold">멘토링에 대해</div>
         <div className="text-center font-bold">후기를 남겨주세요!</div>

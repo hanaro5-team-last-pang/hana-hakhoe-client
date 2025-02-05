@@ -55,7 +55,7 @@ export async function getLectureReviews(
 export async function postLectureReviews(
   state: ActionResType<ReviewFormType, string>,
   formData: FormData
-): Promise<BaseResType<ReviewFormType>> {
+): Promise<ActionResType<ReviewFormType, string>> {
   const accessJwtCookie = await checkAuthAndGetCookie();
   console.log(formData);
   const content = formData.get('content') as string;
@@ -69,8 +69,12 @@ export async function postLectureReviews(
   if (!res.ok) {
     notFound();
   }
-  const data = await res.json();
-  return data.result;
+  const data = (await res.json()) as BaseResType<ReviewFormType>;
+  return {
+    value: data.result,
+    message: data.message,
+    isError: false,
+  };
 }
 
 /**
