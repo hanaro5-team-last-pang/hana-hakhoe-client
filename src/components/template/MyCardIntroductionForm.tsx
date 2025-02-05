@@ -24,6 +24,7 @@ export default function MyCardIntroductionForm({
         <textarea
           className="text-md bg-inherit text-gray-700 px-2 my-3 w-full h-3/4 outline outline-2 outline-blue-400 focus:outline-blue-400 focus:outline-2"
           value={newIntroduction}
+          placeholder="멘토님에 대한 소개를 해주세요"
           onChange={(e) => setNewIntroduction(e.target.value)}
         />
       )}

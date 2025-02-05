@@ -5,16 +5,23 @@ import {
   ProfileRequestType,
   ProfileResponseType,
 } from '@/app/(main)/mypage/type';
+import { changeProfileForm } from '@/app/action';
 import Button from '@/components/atoms/Button';
 import MyCardCareerForm from '@/components/template/MyCardCareerForm';
 import MyCardIntroductionForm from '@/components/template/MyCardIntroductionForm';
-import MyCardProfileForm from '@/components/template/MyCardProfileForm';
 import { DEFAULT_PROFILE_URL } from '@/constant';
 import { useAuthStore } from '@/context/AuthContext';
 import { FaQuoteLeft, FaQuoteRight } from 'react-icons/fa6';
 import { RiPencilFill } from 'react-icons/ri';
 import { toast } from 'react-toastify';
-import { startTransition, useActionState, useEffect, useState } from 'react';
+import Image from 'next/image';
+import {
+  ChangeEvent,
+  startTransition,
+  useActionState,
+  useEffect,
+  useState,
+} from 'react';
 
 export default function Page() {
   const { auth, loading } = useAuthStore((state) => state);
@@ -24,6 +31,17 @@ export default function Page() {
   const [profileData, setProfileData] = useState<ProfileResponseType | null>(
     null
   );
+  const [oneLineIntroduction, setOneLineIntroduction] = useState<string>('');
+  const [newOneLineIntroduction, setNewOneLineIntroduction] =
+    useState<string>(oneLineIntroduction);
+  const [simpleInfo] = useState<{ key: string; value: string }[]>([]);
+  const [introduction, setIntroduction] = useState<string>('');
+  const [newIntroduction, setNewIntroduction] = useState<string>(introduction);
+  const [career, setCareer] = useState<string>('');
+  const [newCareer, setNewCareer] = useState<string>(career);
+  const [showNewImage, setShowNewImage] = useState<string | null>(null);
+  const [newImage, setNewImage] = useState<File | null>(null);
+
   const [, formAction] = useActionState(ModifyProfile, {
     value: {
       shortIntroduction: '',
@@ -33,22 +51,16 @@ export default function Page() {
     message: '명함 수정',
     isError: false,
   });
-
-  // 상태 설정
-  const [oneLineIntroduction, setOneLineIntroduction] =
-    useState<string>('한 줄 소개를 입력하세요');
-  const [newOneLineIntroduction, setNewOneLineIntroduction] =
-    useState<string>(oneLineIntroduction);
-  const [simpleInfo, setSimpleInfo] = useState<
-    { key: string; value: string }[]
-  >([]);
-
-  const [introduction, setIntroduction] = useState<string>('');
-  const [newIntroduction, setNewIntroduction] = useState<string>(introduction);
-  const [career, setCareer] = useState<string>('');
-  const [newCareer, setNewCareer] = useState<string>(career);
-  const [showNewImage, setShowNewImage] = useState<string | null>(null);
-  const [newImage, setNewImage] = useState<File | null>(null);
+  const [, profileAction] = useActionState(changeProfileForm, {
+    value: {
+      newImage: newImage,
+      currentPassword: '',
+      newPassword: '',
+      newConfirmedPassword: '',
+    },
+    message: '',
+    isError: false,
+  });
 
   const handleModifyMode = () => {
     setModifyMode(true);
@@ -62,6 +74,18 @@ export default function Page() {
     setModifyMode(false);
   };
 
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setShowNewImage(reader.result as string);
+        setNewImage(file);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmitNewData = async () => {
     const value: ProfileRequestType = {
       shortIntroduction: newOneLineIntroduction,
@@ -72,12 +96,17 @@ export default function Page() {
       ],
     };
 
+    const formData = new FormData();
+    if (newImage) {
+      formData.append('profile-image-upload', newImage);
+    }
+
     startTransition(async () => {
       try {
-        await formAction(value);
-        toast.success('명함 수정을 완료했습니다.');
+        await Promise.all([formAction(value), profileAction(formData)]);
+        toast.success('명함 정보가 수정되었습니다.');
       } catch {
-        toast.error('명함 수정에 실패했습니다.');
+        toast.error('수정 실패, 다시 시도해주세요.');
       }
     });
 
@@ -99,18 +128,13 @@ export default function Page() {
         setNewOneLineIntroduction(profile.short_introduction);
       }
       if (profile.detail_info) {
-        const introductionValue =
-          profile.detail_info[0]?.value || '자신의 소개에 대해 입력하세요';
-        const careerValue =
-          profile.detail_info[1]?.value || '자신의 이력에 대해 입력하세요';
+        const introductionValue = profile.detail_info[0]?.value || '';
+        const careerValue = profile.detail_info[1]?.value || '';
 
         setNewIntroduction(introductionValue);
         setIntroduction(introductionValue);
         setNewCareer(careerValue);
         setCareer(careerValue);
-      }
-      if (profile.simple_info) {
-        setSimpleInfo(profile.simple_info || []);
       }
     };
     fetchProfile();
@@ -160,6 +184,7 @@ export default function Page() {
           <input
             className="text-xl w-full px-2 text-center align-middle outline outline-2 outline-blue-400 focus:outline-2 focus:outline-blue-400"
             value={newOneLineIntroduction}
+            placeholder="한 줄 소개를 입력하세요"
             onChange={(e) => setNewOneLineIntroduction(e.target.value)}
           />
         ) : (
@@ -172,16 +197,27 @@ export default function Page() {
         </div>
       </div>
       <div className="grid grid-cols-2">
-        <div className="flex justify-center">
-          <MyCardProfileForm
-            userImage={userImage}
-            modifyMode={modifyMode}
-            setNewImage={setNewImage}
-            showNewImage={showNewImage!}
-            setShowNewImage={setShowNewImage}
-            simpleInfo={simpleInfo} // simple_info 전달
-            setSimpleInfo={setSimpleInfo}
-          />
+        <div>
+          <div className="flex flex-col items-center">
+            <div className="relative w-56 h-56 my-4">
+              <Image
+                className="rounded-full object-cover"
+                src={showNewImage || userImage}
+                alt="Profile Image"
+                fill
+              />
+            </div>
+            {modifyMode && (
+              <div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="mt-2 items-center"
+                />
+              </div>
+            )}
+          </div>
         </div>
         <MyCardIntroductionForm
           modifyMode={modifyMode}

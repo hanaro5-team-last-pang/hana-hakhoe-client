@@ -3,6 +3,8 @@
 import { getProfileCard } from '@/app/(main)/mentorings/actions';
 import { ProfileResponseType } from '@/app/(main)/mypage/type';
 import DefaultSpinner from '@/components/template/DefaultSpinner';
+import { DEFAULT_PROFILE_URL } from '@/constant';
+import sha256 from 'crypto-js/sha256';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
@@ -32,51 +34,50 @@ export default function MentoringIntroduceForm(props: Props) {
       </h1>
       <div>
         <h2 className="w-full text-center text-gray-700 text-lg my-4">
-          {' '}
           {card.short_introduction}
         </h2>
       </div>
-      <div className="flex items-start justify-between p-4 rounded-lg">
-        <div className="flex items-center">
-          <div className="flex flex-col items-center border p-4 rounded-lg">
-            <div className="relative w-32 h-32 rounded-full overflow-hidden">
-              {card.profileImageUrl ? (
-                <Image
-                  src={card.profileImageUrl}
-                  alt="멘토 명함"
-                  layout="fill"
-                  objectFit="cover"
-                />
-              ) : (
-                <Image
-                  src={'/img_landing.png'} // 실제 이미지 URL로 교체
-                  alt={'멘토 명함'}
-                  layout="fill"
-                  objectFit="cover"
-                />
-              )}
-            </div>
-            <span className="text-gray-700 mt-2">
-              {/* simple_info  key - value 쌍 출력 */}
-              {card.simple_info.map((info, index) => (
-                <div key={index}>
-                  {info.key}: {info.value}
-                </div>
-              ))}
-            </span>
-          </div>
+
+      <div className="w-full flex flex-col items-center p-4 rounded-lg">
+        <div className="relative w-40 h-40 rounded-full overflow-hidden mb-4">
+          {card.profileImageUrl ? (
+            <Image
+              src={card.profileImageUrl}
+              alt="멘토 명함"
+              layout="fill"
+              objectFit="cover"
+            />
+          ) : (
+            <Image
+              src={`${DEFAULT_PROFILE_URL}/${sha256(card.mentor_name)}?s=32&d=identicon&r=PG`}
+              alt={'멘토 명함'}
+              layout="fill"
+              objectFit="cover"
+            />
+          )}
         </div>
-        <div className="flex-1 ml-4 p-4 border rounded-lg">
-          <p className="text-lg font-semibold mb-1"> 자기 소개 </p>
-          <h3 className="text-lg text-gray-800">
-            {' '}
-            {card.detail_info[0]?.value}
-          </h3>
+
+        <div className="w-full flex flex-col items-start p-4 border rounded-lg mb-4">
+          <p className="text-lg font-semibold mb-1">자기 소개</p>
+          {card.detail_info[0]?.value ? (
+            <h3 className="text-lg text-gray-800 whitespace-pre-line">
+              {card.detail_info[0].value}
+            </h3>
+          ) : (
+            <p className="text-sm"> 등록된 소개가 없습니다. </p>
+          )}
         </div>
-      </div>
-      <div className="my-3 rounded-lg p-4 border mx-3">
-        <p className="text-lg font-semibold mb-1"> 경력 </p>
-        <h3 className="text-lg text-gray-800">{card.detail_info[1]?.value}</h3>
+
+        <div className="w-full flex flex-col items-start p-4 border rounded-lg">
+          <p className="text-lg font-semibold mb-1">경력</p>
+          {card.detail_info[1]?.value ? (
+            <h3 className="text-lg text-gray-800 whitespace-pre-line">
+              {card.detail_info[1].value}
+            </h3>
+          ) : (
+            <p className="text-sm"> 등록된 내용이 없습니다. </p>
+          )}
+        </div>
       </div>
     </div>
   );
