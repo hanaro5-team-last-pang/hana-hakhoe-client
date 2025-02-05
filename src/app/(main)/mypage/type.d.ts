@@ -78,9 +78,9 @@ export type InfoType = {
 export type ProfileResponseType = {
   mentor_name: string;
   profileImageUrl: string;
-  short_introduction: string;
-  simple_info: InfoType[];
-  detail_info: InfoType[];
+  shortIntroduction: string;
+  simpleInfo: InfoType[];
+  detailInfo?: InfoType[];
 };
 
 export type ProfileRequestType = {

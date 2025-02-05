@@ -34,7 +34,7 @@ export default function MentoringIntroduceForm(props: Props) {
       </h1>
       <div>
         <h2 className="w-full text-center text-gray-700 text-lg my-4">
-          {card.short_introduction}
+          {card.shortIntroduction}
         </h2>
       </div>
 
@@ -59,9 +59,9 @@ export default function MentoringIntroduceForm(props: Props) {
 
         <div className="w-full flex flex-col items-start p-4 border rounded-lg mb-4">
           <p className="text-lg font-semibold mb-1">자기 소개</p>
-          {card.detail_info[0]?.value ? (
+          {card.detailInfo && card.detailInfo[0].value ? (
             <h3 className="text-lg text-gray-800 whitespace-pre-line">
-              {card.detail_info[0].value}
+              {card.detailInfo[0].value}
             </h3>
           ) : (
             <p className="text-sm"> 등록된 소개가 없습니다. </p>
@@ -70,9 +70,9 @@ export default function MentoringIntroduceForm(props: Props) {
 
         <div className="w-full flex flex-col items-start p-4 border rounded-lg">
           <p className="text-lg font-semibold mb-1">경력</p>
-          {card.detail_info[1]?.value ? (
+          {card.detailInfo && card.detailInfo[1]?.value ? (
             <h3 className="text-lg text-gray-800 whitespace-pre-line">
-              {card.detail_info[1].value}
+              {card.detailInfo[1].value}
             </h3>
           ) : (
             <p className="text-sm"> 등록된 내용이 없습니다. </p>

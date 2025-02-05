@@ -18,7 +18,7 @@ export default function MentoringFAQForm(props: Props) {
       lectureId,
       content: '',
     },
-    message: 'faq 등록',
+    message: '',
     isError: false,
   });
 

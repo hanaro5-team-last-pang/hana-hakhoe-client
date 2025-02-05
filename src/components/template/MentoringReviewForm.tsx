@@ -20,7 +20,7 @@ export default function MentoringReviewForm(props: Props) {
   useEffect(() => {
     const loadReviewResponse = async () => {
       const reviewRes = await getLectureReviews(lectureId);
-      setReviewRes(reviewRes.result);
+      setReviewRes(reviewRes);
     };
     loadReviewResponse().then();
   }, []);

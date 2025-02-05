@@ -41,13 +41,13 @@ export async function getProfileCard(lectureId: number) {
 
 export async function getLectureReviews(
   lectureId: number
-): Promise<BaseResType<ReviewPageResponseType>> {
+): Promise<ReviewPageResponseType> {
   const res = await fetcher('GET', `/lectures/reviews/${lectureId}`);
 
   if (!res.ok) {
     notFound();
   }
-  const data = await res.json();
+  const data = (await res.json()) as BaseResType<ReviewPageResponseType>;
   return data.result;
 }
 

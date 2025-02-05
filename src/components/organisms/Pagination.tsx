@@ -34,7 +34,7 @@ export default function Pagination({
     startPage = Math.max(totalPages - maxButtons, 0);
   }
 
-  const queryParams = new URLSearchParams(subUrl.split('?')[1]);
+  const queryParams = new URLSearchParams(subUrl?.split('?')[1]);
 
   const handlePageChange = (page: number) => {
     if (page < 0 || page >= totalPages) return;
