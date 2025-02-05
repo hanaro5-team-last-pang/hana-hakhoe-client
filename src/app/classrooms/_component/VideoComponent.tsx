@@ -12,13 +12,14 @@ import useLocalVideo from '@/hooks/useLocalVideo';
 import useMediaDevices from '@/hooks/useMediaDevices';
 import usePeerConnections from '@/hooks/useWebRTC';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useRef } from 'react';
 
 interface Props {
-  classroomId: bigint;
+  classroomId: string;
+  mentorKey?: string;
 }
 
-export default function VideoComponent({ classroomId }: Props) {
+export default function VideoComponent({ classroomId, mentorKey }: Props) {
   const router = useRouter();
   const { auth, loading } = useAuthStore((state) => state);
   const { videoRef, changeDevice, stream } = useLocalVideo();
@@ -26,14 +27,18 @@ export default function VideoComponent({ classroomId }: Props) {
   const isConnected = useContext(StompIsConnectedContext);
   const publish = useContext(StompPublishContext);
   const { subscribeEnter, closeClassroom, startScreenStream } =
-    usePeerConnections(classroomId, stream!, router);
+    usePeerConnections(classroomId, stream!, router, mentorKey);
+
+  const executedRef = useRef(false);
 
   useEffect(() => {
-    if (isConnected && stream && auth!) {
+    if (isConnected && stream && auth! && !executedRef.current) {
       if (auth.role === 'MENTOR') {
+        executedRef.current = true;
         subscribeEnter(auth.userId);
       }
       if (auth.role === 'MENTEE') {
+        executedRef.current = true;
         subscribeEnter(auth.userId);
         publish(ENTER_PUBLISH_URL(classroomId), {
           type: 'Enter',

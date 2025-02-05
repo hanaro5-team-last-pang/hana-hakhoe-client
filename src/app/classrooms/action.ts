@@ -4,26 +4,33 @@ import {
   EnterClassroomResType,
   StartClassroomResType,
 } from '@/app/(main)/mypage/type';
+import { AuthType, BaseResType } from '@/types/hanaHakdang';
 import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
 import { fetcher } from '@/utils/fetcher';
+import { cookies } from 'next/headers';
+import { notFound } from 'next/navigation';
 
 export async function startClassroom(
-  classroomId: BigInt
+  classroomId: string
 ): Promise<StartClassroomResType> {
   const accessJwtCookie = await checkAuthAndGetCookie();
 
+  console.log('start classroom...', classroomId, accessJwtCookie);
   const res = await fetcher('POST', `/classrooms/${classroomId}/start`, {
     jwt: accessJwtCookie.value,
   });
 
-  console.log(res);
+  console.log('get response of staring classroom', res);
+  if (!res.ok) {
+    notFound();
+  }
 
-  const data = await res.json();
+  const data = (await res.json()) as BaseResType<StartClassroomResType>;
   return data.result;
 }
 
 export async function enterClassroom(
-  classroomId: BigInt
+  classroomId: string
 ): Promise<EnterClassroomResType> {
   const accessJwtCookie = await checkAuthAndGetCookie();
 
@@ -33,6 +40,15 @@ export async function enterClassroom(
 
   console.log(res);
 
-  const data = await res.json();
+  if (!res.ok) {
+    notFound();
+  }
+
+  const data = (await res.json()) as BaseResType<EnterClassroomResType>;
   return data.result;
 }
+
+export const getRoleCookie = async () => {
+  const cookieStore = await cookies();
+  return cookieStore.get('role') as AuthType['role'];
+};

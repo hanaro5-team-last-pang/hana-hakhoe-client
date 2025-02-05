@@ -17,7 +17,7 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.share
 import { useState, useContext, useCallback } from 'react';
 
 const usePeerConnections = (
-  classroomId: bigint,
+  classroomId: string,
   stream: MediaStream,
   router: AppRouterInstance,
   mentorId?: string
@@ -194,6 +194,7 @@ const usePeerConnections = (
           }
         } else if (description.type === 'answer') {
           const localPeerConnection = pcListMap.get(peerId)?.local;
+          console.log(localPeerConnection);
           if (!localPeerConnection) {
             return;
           }

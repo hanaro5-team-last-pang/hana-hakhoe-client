@@ -20,7 +20,7 @@ export async function getMentorings(): Promise<MentoringResponseType> {
     jwt: accessJwtCookie.value,
   });
 
-  const data = await res.json();
+  const data = (await res.json()) as BaseResType<MentoringResponseType>;
   return data.result;
 }
 
@@ -119,7 +119,7 @@ export async function getMentoringForMentee(): Promise<MenteeMentoringResType> {
     jwt: accessJwtCookie.value,
   });
 
-  const data = await res.json();
+  const data = (await res.json()) as BaseResType<MenteeMentoringResType>;
   return data.result;
 }
 
@@ -130,6 +130,6 @@ export async function getMentoringHistory(): Promise<MenteeMentoringResType> {
     jwt: accessJwtCookie.value,
   });
 
-  const data = await res.json();
+  const data = (await res.json()) as BaseResType<MenteeMentoringResType>;
   return data.result;
 }
