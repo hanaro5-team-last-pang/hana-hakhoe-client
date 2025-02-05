@@ -22,9 +22,10 @@ import {
 
 interface Props {
   classroomId: string;
+  mentorId?: string;
 }
 
-export default function ChatComponent({ classroomId }: Props) {
+export default function ChatComponent({ classroomId, mentorId }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { auth } = useAuthStore((state) => state);
   const isConnected = useContext(StompIsConnectedContext);
@@ -102,7 +103,13 @@ export default function ChatComponent({ classroomId }: Props) {
                 </>
               ) : (
                 <>
-                  <p className="text-gray-500 my-2">{chat.username}</p>
+                  {chat.userId === mentorId ? (
+                    <p className="text-gray-500 my-2">{chat.username} 멘토</p>
+                  ) : (
+                    <p className="text-gray-500 my-2 text-end">
+                      {chat.username}
+                    </p>
+                  )}
                   <div className="inline-flex items-end bg-gray-400 text-white rounded-md p-2">
                     <p className="mr-2">{chat.body}</p>
                     <p className="text-2xs">{formatDate(chat.timestamp)}</p>
