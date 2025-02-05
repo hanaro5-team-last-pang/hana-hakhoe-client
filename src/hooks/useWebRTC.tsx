@@ -1,3 +1,4 @@
+import { terminateClassroom } from '@/app/classrooms/action';
 import {
   ENTER_PUBLISH_URL,
   ENTER_SUBSCRIBE_URL,
@@ -297,13 +298,14 @@ const usePeerConnections = (
     }
   };
 
-  const closeClassroom = (userId: string) => {
+  const closeClassroom = async (userId: string, classroomId: string) => {
     publish(ENTER_PUBLISH_URL(classroomId), { type: 'Close', key: userId });
     pcListMap.forEach(({ local, remote }) => {
       local?.close();
       remote?.close();
     });
     pcListMap.clear();
+    await terminateClassroom(classroomId);
     router.replace(`/mentorings`);
   };
 
