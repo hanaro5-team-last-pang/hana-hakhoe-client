@@ -3,7 +3,6 @@
 import {
   ActionResType,
   BaseResType,
-  SubmitReviewFormType,
   ChangeProfileFormType,
 } from '@/types/hanaHakdang';
 import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
@@ -72,20 +71,6 @@ export async function changeProfileForm(
   return {
     value: prevState.value,
     message: data.message,
-    isError: false,
-  };
-}
-
-export async function submitReview(
-  prevState: ActionResType<SubmitReviewFormType, string>,
-  formData: FormData
-): Promise<ActionResType<SubmitReviewFormType, string>> {
-  const value = Object.fromEntries(formData) as SubmitReviewFormType;
-  const message = '후기 제출 액션';
-
-  return {
-    value: value,
-    message: message,
     isError: false,
   };
 }

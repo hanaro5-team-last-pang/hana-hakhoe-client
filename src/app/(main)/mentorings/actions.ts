@@ -4,6 +4,7 @@ import {
   FaqFormType,
   FaqResponseType,
   LectureType,
+  ReviewFormType,
   ReviewPageResponseType,
 } from '@/app/(main)/mentorings/type';
 import { ProfileResponseType } from '@/app/(main)/mypage/type';
@@ -35,7 +36,7 @@ export async function getProfileCard(lectureId: number) {
 }
 
 /**
- * 탭 메뉴 3 - 리뷰 조회
+ * 탭 메뉴 3 - 리뷰 조회, 등록
  * @param lectureId
  */
 
@@ -48,6 +49,27 @@ export async function getLectureReviews(
     notFound();
   }
   const data = (await res.json()) as BaseResType<ReviewPageResponseType>;
+  return data.result;
+}
+
+export async function postLectureReviews(
+  state: ActionResType<ReviewFormType, string>,
+  formData: FormData
+): Promise<BaseResType<ReviewFormType>> {
+  const accessJwtCookie = await checkAuthAndGetCookie();
+  console.log(formData);
+  const content = formData.get('content') as string;
+  const score = Number(formData.get('score'));
+  const lectureId = formData.get('lectureId') as string;
+
+  const res = await fetcher('POST', `lectures/reviews/${lectureId}`, {
+    jwt: accessJwtCookie.value,
+    body: JSON.stringify({ content: content, score: score }),
+  });
+  if (!res.ok) {
+    notFound();
+  }
+  const data = await res.json();
   return data.result;
 }
 

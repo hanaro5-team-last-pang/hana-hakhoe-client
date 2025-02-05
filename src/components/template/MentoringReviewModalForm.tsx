@@ -1,16 +1,26 @@
 'use client';
 
-import { submitReview } from '@/app/action';
+import { postLectureReviews } from '@/app/(main)/mentorings/actions';
 import Button from '@/components/atoms/Button';
 import Carousel from '@/components/molecules/Carousel';
 import { CardType } from '@/types/hanaHakdang';
 import { Rating } from 'react-simple-star-rating';
-import { useActionState, useState } from 'react';
+import { useActionState, useState, useRef } from 'react';
 
-export default function MentoringReviewModalForm() {
+export default function MentoringReviewModalForm({
+  lectureId,
+}: {
+  lectureId: number;
+}) {
   const [rating, setRating] = useState(0);
-  const [state, formAction] = useActionState(submitReview, {
-    value: { ratingScore: rating.toString(), review: '' },
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  const [, formAction] = useActionState(postLectureReviews, {
+    value: {
+      lectureId: lectureId,
+      score: rating || 0,
+      content: textAreaRef.current?.value || '',
+    },
     message: '후기 제출 전 폼',
     isError: false,
   });
@@ -39,7 +49,7 @@ export default function MentoringReviewModalForm() {
   ];
 
   return (
-    <form action={formAction}>
+    <form onSubmit={formAction}>
       <div>
         <div className="text-center font-bold">멘토링에 대해</div>
         <div className="text-center font-bold">후기를 남겨주세요!</div>
@@ -56,9 +66,9 @@ export default function MentoringReviewModalForm() {
               />
             </div>
             <textarea
+              ref={textAreaRef}
               className="w-full font-bold px-2 py-6 rounded-lg drop-shadow-lg text-gray-400 focus:outline-none resize-none text-left placeholder:text-center placeholder:text-gray-400 scrollbar-hide"
               placeholder={`멘토링 후기를 남겨주시면\n품질이 올라갑니다.`}
-              defaultValue={state.value.review}
             ></textarea>
             <div className="flex justify-center my-1">
               <Button

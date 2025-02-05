@@ -54,13 +54,19 @@ export type FaqResponseType = {
   id: number;
   userName: string;
   content: string;
-  profileImageUrl?: string;
+  ImageUrl: string;
   createdAt: Date;
   answers: AnswerType[];
 };
 
 export type FaqFormType = {
   lectureId: number;
+  content: string;
+};
+
+export type ReviewFormType = {
+  lectureId: number;
+  score: number;
   content: string;
 };
 

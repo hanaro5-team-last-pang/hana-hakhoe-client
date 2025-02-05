@@ -29,18 +29,21 @@ export default function Page() {
                 start_date: lecture.startTime,
                 status: '시작 전',
                 classroomId: lecture.classroomId,
+                lectureId: lecture.lectureId,
               })),
               ...result.lectureList.ableToStart.map((lecture) => ({
                 title: lecture.title,
                 start_date: lecture.startTime,
                 status: '진행 중',
                 classroomId: lecture.classroomId,
+                lectureId: lecture.lectureId,
               })),
               ...result.lectureList.done.map((lecture) => ({
                 title: lecture.title,
                 start_date: lecture.startTime,
                 status: '완료',
                 classroomId: lecture.classroomId,
+                lectureId: lecture.lectureId,
               })),
             ];
             setMentorings(mentorings);
@@ -57,6 +60,7 @@ export default function Page() {
               start_date: mentoring.startTime,
               status: '시작 전',
               classroomId: mentoring.classroomId,
+              lectureId: mentoring.lectureId,
             }));
 
             const historiesData = result_history.enrollmentList.map(
@@ -66,6 +70,7 @@ export default function Page() {
                 start_date: mentoring.startTime,
                 status: mentoring.isDone ? '수강 완료' : '취소됨',
                 classroomId: mentoring.classroomId,
+                lectureId: mentoring.lectureId,
               })
             );
 

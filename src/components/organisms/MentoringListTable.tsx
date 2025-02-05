@@ -82,8 +82,7 @@ export default function MentoringListTable(props: Props) {
       },
       onCellClicked: async (params) => {
         if (params.data.status === '수강 완료') {
-          // '리뷰 남기기' 버튼 클릭 시 처리 로직
-          redirect(`/reviews/${params.data.id}`);
+          redirect(`/mentorings/${params.data.lectureId}`);
         } else {
           if (role === 'MENTOR') {
             redirect(`/classrooms/${params.data.classroomId}`);
@@ -110,8 +109,9 @@ export default function MentoringListTable(props: Props) {
 
   const handleRowClick = useCallback(
     (event: RowClickedEvent) => {
-      const rowId = event.data.id;
-      router.push(`/mentorings/${rowId}`);
+      const lectureId = event.data.lectureId;
+      console.log(lectureId);
+      router.push(`/mentorings/${lectureId}`);
     },
     [router]
   );

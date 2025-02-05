@@ -51,19 +51,15 @@ export default function OpenMentoringForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const today = dayjs().tz('Asia/Seoul');
-    const selectedDate = dayjs(dateRef.current?.value).tz('Asia/Seoul');
+    const selectedDate = dayjs(dateRef.current?.value);
 
     const selectedStartTime = dayjs(
       `${dateRef.current?.value} ${startTimeRef.current?.value}`
-    )
-      .tz('Asia/Seoul')
-      .format('YYYY-MM-DD HH:mm:ss');
+    ).format('YYYY-MM-DD HH:mm:ss');
 
     const selectedEndTime = dayjs(
       `${dateRef.current?.value} ${endTimeRef.current?.value}`
-    )
-      .tz('Asia/Seoul')
-      .format('YYYY-MM-DD HH:mm:ss');
+    ).format('YYYY-MM-DD HH:mm:ss');
 
     if (
       !image ||
