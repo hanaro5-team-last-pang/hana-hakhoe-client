@@ -67,12 +67,6 @@ export type CardType = {
   cardImageUrl: string;
 };
 
-export type AccountType = {
-  name: string;
-  birth: string;
-  profileImage: string;
-};
-
 export type Jwt = {
   accessToken: string;
 };
@@ -83,4 +77,10 @@ type AuthResType = {
   role: 'MENTOR' | 'MENTEE';
   profileImageUrl?: string;
   birthDate: string;
+};
+
+export type Category5 = {
+  category: string;
+  name: string;
+  count: number;
 };

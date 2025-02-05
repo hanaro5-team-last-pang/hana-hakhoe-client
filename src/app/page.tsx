@@ -9,10 +9,10 @@ import CardView from '@/components/organisms/CardView';
 import Footer from '@/components/organisms/Footer';
 import Header from '@/components/organisms/Header';
 import { BADGE_COLORS } from '@/constant';
-import { BaseResType } from '@/types/hanaHakdang';
-import { iconButtonData } from '@/utils/dummy';
+import { BaseResType, Category5 } from '@/types/hanaHakdang';
 import { fetcher } from '@/utils/fetcher';
 import { getRandomIndex } from '@/utils/getRandomIndex';
+import dayjs from 'dayjs';
 import landing from 'public/img_landing_3.png';
 import banner from 'public/img_main_banner.png';
 import Image from 'next/image';
@@ -20,14 +20,16 @@ import Image from 'next/image';
 const newsUrlDomain = 'https://www.fetimes.co.kr';
 
 export default async function Home() {
-  const [newsRes, lecturesRes] = await Promise.all([
+  const [newsRes, lecturesRes, catRes] = await Promise.all([
     fetcher('GET', '/news'),
     fetcher('GET', '/lectures'),
+    fetcher('GET', '/lectures/count'),
   ]);
 
-  const newsData = (await newsRes.json()) as BaseResType<NewsType[]>;
+  const newsData = (await newsRes.json()) as BaseResType<NewsType>;
   const lecturesData =
     (await lecturesRes.json()) as BaseResType<LectureListResponse>;
+  const cat = (await catRes.json()) as BaseResType<Category5[]>;
 
   return (
     <>
@@ -55,13 +57,13 @@ export default async function Home() {
             />
             {/* 아이콘 버튼 배치 */}
             <div className="grid grid-cols-5 gap-5 mt-4">
-              {iconButtonData.slice(0, 5).map((data, index) => (
+              {cat.result.map((categories, index: number) => (
                 <IconButton
                   key={index}
-                  icon={data.icon}
-                  label={data.label}
-                  count={data.count}
-                  route={data.route}
+                  index={index}
+                  label={categories.name}
+                  count={categories.count}
+                  route={categories.category}
                 />
               ))}
             </div>
@@ -89,7 +91,7 @@ export default async function Home() {
                       key={lecture.lectureId}
                       title={lecture.title}
                       imageSrc={lecture.thumbnailImgUrl}
-                      start_time={lecture.startTime}
+                      start_time={dayjs(lecture.startTime).format('YYYY-MM-DD')}
                       participants={lecture.currParticipants}
                       max_participants={lecture.maxParticipants}
                       category={lecture.category}
@@ -124,12 +126,13 @@ export default async function Home() {
               buttonRoute="/news"
             />
             <div className="grid grid-rows-1 sm:grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-              {newsData.result.slice(0, 3).map((news) => (
+              {newsData.result.newsList.slice(0, 3).map((news) => (
                 <CardView
                   key={news.id}
                   imageSrc={news.newsThumbnailUrl}
                   title={news.title}
                   id={newsUrlDomain + news.newsUrl}
+                  date={dayjs(news.createdAt).format('YYYY-MM-DD')}
                 />
               ))}
             </div>

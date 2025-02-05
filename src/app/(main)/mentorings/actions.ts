@@ -113,7 +113,6 @@ export async function deleteFaq(
  */
 export async function getCategory() {
   const res = await fetcher('GET', '/lectures/categories');
-
   const data = await res.json();
 
   if (!res.ok) {

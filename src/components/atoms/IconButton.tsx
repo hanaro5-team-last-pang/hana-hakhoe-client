@@ -1,23 +1,39 @@
+import { FaChalkboardTeacher } from 'react-icons/fa';
+import {
+  FaBook,
+  FaClipboardList,
+  FaGraduationCap,
+  FaUsers,
+} from 'react-icons/fa6';
 import Link from 'next/link';
-import { JSX } from 'react';
+
+export const iconData = [
+  { icon: <FaBook /> },
+  { icon: <FaChalkboardTeacher /> },
+  { icon: <FaGraduationCap /> },
+  { icon: <FaUsers /> },
+  { icon: <FaClipboardList /> },
+];
 
 interface IconButtonProps {
-  icon: JSX.Element;
   label: string;
   count?: number;
   route: string;
+  index: number;
   className?: string;
 }
 
 export default function IconButton({
-  icon,
   label,
   route,
   count,
+  index,
   className = '',
 }: IconButtonProps) {
+  const icon = iconData[index]?.icon || null;
+
   return (
-    <Link href={route}>
+    <Link href={`/mentorings?category=${route}`}>
       <div
         className={`flex flex-col items-center justify-center ${className} pb-[100%] rounded-xl border-gray-200 border-[0.5px] 
         shadow-md transition-transform duration-300 ease-in-out transform hover:-translate-y-2 cursor-pointer`}
