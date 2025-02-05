@@ -1,7 +1,7 @@
 'use server';
 
 import { LectureType } from '@/app/(main)/mentorings/type';
-import { ActionResType } from '@/types/hanaHakdang';
+import { ActionResType, BaseResType } from '@/types/hanaHakdang';
 import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
 import { fetcher } from '@/utils/fetcher';
 import { notFound } from 'next/navigation';
@@ -12,7 +12,7 @@ import { notFound } from 'next/navigation';
 
 export async function enrollLecture(
   lectureId: number
-): Promise<ActionResType<LectureType, string>> {
+): Promise<ActionResType<null, string>> {
   const accessJwtCookie = await checkAuthAndGetCookie();
 
   const res = await fetcher('POST', `/lectures/${lectureId}/enroll`, {
@@ -20,10 +20,18 @@ export async function enrollLecture(
   });
 
   if (!res.ok) {
-    notFound();
+    return {
+      value: null,
+      message: '수강 신청에 실패했습니다.',
+      isError: true,
+    };
   }
-  const result = await res.json();
-  return result.message;
+  const result = (await res.json()) as BaseResType<null>;
+  return {
+    value: null,
+    message: result.message,
+    isError: false,
+  };
 }
 
 export async function withdrawLecture(

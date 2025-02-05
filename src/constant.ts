@@ -1,6 +1,6 @@
-export const BASE_URL = 'http://localhost:8080';
-// export const BASE_URL =
-//   'http://ec2-54-180-148-79.ap-northeast-2.compute.amazonaws.com';
+// export const BASE_URL = 'http://localhost:8080';
+export const BASE_URL =
+  'http://ec2-54-180-148-79.ap-northeast-2.compute.amazonaws.com';
 
 export const BASE_HEADERS: HeadersInit = {
   'Content-type': 'application/json',
@@ -37,3 +37,12 @@ export const ENTER_SUBSCRIBE_URL = (classroomId: bigint) =>
   `/topic/enter/${classroomId}`;
 export const ENTER_PUBLISH_URL = (classroomId: bigint) =>
   `/app/enter/${classroomId}`;
+
+export const BADGE_COLORS = [
+  'bg-green-400',
+  'bg-yellow-400',
+  'bg-blue-400',
+  'bg-red-400',
+  'bg-purple-400',
+  'bg-pink-400',
+];

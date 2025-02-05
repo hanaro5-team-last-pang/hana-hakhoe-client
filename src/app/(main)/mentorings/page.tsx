@@ -7,8 +7,10 @@ import CheckboxList from '@/components/molecules/CheckboxList';
 import CardView from '@/components/organisms/CardView';
 import MentoringList from '@/components/organisms/MentoringList';
 import SearchBar from '@/components/template/SearchBar';
+import { BADGE_COLORS } from '@/constant';
 import { BaseResType } from '@/types/hanaHakdang';
 import { fetcher } from '@/utils/fetcher';
+import { getRandomIndex } from '@/utils/getRandomIndex';
 import dayjs from 'dayjs';
 
 //TODO: 임시 default image
@@ -73,18 +75,44 @@ export default async function Page(props: { searchParams: SearchParams }) {
               <h1 className="text-2xl font-bold">전체 멘토링 강의</h1>
               <SearchBar />
             </div>
-            <div className="grid grid-rows-6 gap-6 gap-y-8 mt-4">
-              {cardData.map((card) => (
-                <div key={card.id} className="sm:hidden">
-                  <CardView {...card} id={`/mentorings/${card.id}`} />
-                </div>
-              ))}
-              {cardData.map((card) => (
-                <div key={card.id} className="hidden sm:block">
-                  <MentoringList {...card} id={`/mentorings/${card.id}`} />
-                </div>
-              ))}
-            </div>
+            {cardData.length === 0 ? (
+              <div className="mt-4 flex justify-center">
+                <p>멘토링 강의를 찾을 수 없습니다.</p>
+              </div>
+            ) : (
+              <div className="grid grid-rows-6 gap-6 gap-y-8 mt-4">
+                {cardData.map((card) => {
+                  const idx = getRandomIndex(
+                    card.category,
+                    BADGE_COLORS.length
+                  );
+                  return (
+                    <div key={card.id} className="sm:hidden">
+                      <CardView
+                        {...card}
+                        badgeClassName={BADGE_COLORS[idx]}
+                        id={`/mentorings/${card.id}`}
+                      />
+                    </div>
+                  );
+                })}
+                {cardData.map((card) => {
+                  const idx = getRandomIndex(
+                    card.category,
+                    BADGE_COLORS.length
+                  );
+                  return (
+                    <div key={card.id} className="hidden sm:block">
+                      <MentoringList
+                        {...card}
+                        badgeClassName={BADGE_COLORS[idx]}
+                        id={`/mentorings/${card.id}`}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
         <div className="flex flex-col w-1/6">

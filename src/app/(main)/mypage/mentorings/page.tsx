@@ -75,7 +75,7 @@ export default function Page() {
 
       fetchData();
     }
-  }, [auth?.role]);
+  }, [auth]);
 
   return (
     <div className="w-full">

@@ -33,12 +33,11 @@ export default function MentoringIntro(props: Props) {
   } = props.lectureData;
 
   const handleEnroll = async () => {
-    try {
-      const result = await enrollLecture(lectureId);
-      toast.success(result.message);
-    } catch (error) {
-      console.log(error);
+    const result = await enrollLecture(lectureId);
+    if (result.isError) {
       toast.error('수강 신청에 실패했습니다. 다시 시도해주세요.');
+    } else {
+      toast.success(result.message);
     }
   };
 

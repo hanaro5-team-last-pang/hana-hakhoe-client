@@ -8,9 +8,11 @@ import MainPageText from '@/components/molecules/MainpageText';
 import CardView from '@/components/organisms/CardView';
 import Footer from '@/components/organisms/Footer';
 import Header from '@/components/organisms/Header';
+import { BADGE_COLORS } from '@/constant';
 import { BaseResType } from '@/types/hanaHakdang';
 import { iconButtonData } from '@/utils/dummy';
 import { fetcher } from '@/utils/fetcher';
+import { getRandomIndex } from '@/utils/getRandomIndex';
 import landing from 'public/img_landing_3.png';
 import banner from 'public/img_main_banner.png';
 import Image from 'next/image';
@@ -37,7 +39,7 @@ export default async function Home() {
         <div className="flex w-full justify-center bg-gradient-to-r from-[#FFF5BE] to-[#BDFFE9]">
           <div
             style={{ backgroundImage: `url(${landing.src})` }}
-            className="w-full max-w-screen-xl aspect-video bg-center bg-cover flex items-center"
+            className="w-full max-w-[800px] aspect-video bg-center bg-cover flex items-center"
           >
             <div className="ml-12">
               <LandingText />
@@ -77,21 +79,28 @@ export default async function Home() {
               </div>
             ) : (
               <div className="grid grid-rows-2 xs:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 gap-y-8 mt-4">
-                {lecturesData.result.lectureList.map((lecture) => (
-                  <CardView
-                    key={lecture.lectureId}
-                    title={lecture.title}
-                    imageSrc={lecture.thumbnailImgUrl}
-                    start_time={lecture.startTime}
-                    participants={lecture.currParticipants}
-                    max_participants={lecture.maxParticipants}
-                    category={lecture.category}
-                    duration={lecture.duration}
-                    description={lecture.description}
-                    mentor_name={lecture.mentorName}
-                    id={`mentorings/${lecture.lectureId}`}
-                  />
-                ))}
+                {lecturesData.result.lectureList.map((lecture) => {
+                  const idx = getRandomIndex(
+                    lecture.category,
+                    BADGE_COLORS.length
+                  );
+                  return (
+                    <CardView
+                      key={lecture.lectureId}
+                      title={lecture.title}
+                      imageSrc={lecture.thumbnailImgUrl}
+                      start_time={lecture.startTime}
+                      participants={lecture.currParticipants}
+                      max_participants={lecture.maxParticipants}
+                      category={lecture.category}
+                      duration={lecture.duration}
+                      description={lecture.description}
+                      mentor_name={lecture.mentorName}
+                      badgeClassName={BADGE_COLORS[idx]}
+                      id={`mentorings/${lecture.lectureId}`}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>
