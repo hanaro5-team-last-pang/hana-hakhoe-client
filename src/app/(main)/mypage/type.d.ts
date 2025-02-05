@@ -8,6 +8,7 @@ export type MentoringResponseType = {
 
 type lectureValueType = {
   lectureId: number;
+  classroomId: BigInt;
   title: string;
   isCanceled: boolean;
   isDone: boolean;
@@ -21,8 +22,21 @@ export type MenteeMentoringResType = {
   enrollmentList: MenteeMentoringType[];
 };
 
+export type StartClassroomResType = {
+  password: string;
+  lectureId: number;
+  lectureName: string;
+};
+
+export type EnterClassroomResType = {
+  password: string;
+  mentorId: string;
+  lectureId: number;
+  lectureName: string;
+};
+
 export type MenteeMentoringType = {
-  classroomId: number;
+  classroomId: BigInt;
   lectureId: number;
   mentorId: number;
   mentorName: string;
@@ -40,6 +54,7 @@ export type MentoringTableType = {
   mentorName?: string;
   start_date: string;
   status: string;
+  classroomId: BigInt;
 };
 
 export type openMentoringFormType = {

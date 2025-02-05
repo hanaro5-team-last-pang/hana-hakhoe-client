@@ -61,7 +61,7 @@ export default function MentoringListTable(props: Props) {
     // "강의실 입장" 또는 "리뷰 남기기" 컬럼 설정
     {
       field: 'class',
-      headerName: role === 'MENTOR' ? '멘토링 수정' : '강의실',
+      headerName: role === 'MENTOR' ? '강의 시작 상태' : '강의실',
       width: 130,
       minWidth: 110,
       cellRenderer: (params: ICellRendererParams) => {
@@ -69,7 +69,7 @@ export default function MentoringListTable(props: Props) {
           params.data.status === '수강 완료'
             ? '리뷰 남기기'
             : role === 'MENTOR'
-              ? '멘토링 수정'
+              ? '강의 시작'
               : '강의실 입장';
 
         return (
@@ -80,18 +80,15 @@ export default function MentoringListTable(props: Props) {
           />
         );
       },
-      // 버튼 클릭 이벤트
-      onCellClicked: (params) => {
+      onCellClicked: async (params) => {
         if (params.data.status === '수강 완료') {
           // '리뷰 남기기' 버튼 클릭 시 처리 로직
           redirect(`/reviews/${params.data.id}`);
         } else {
           if (role === 'MENTOR') {
-            // '멘토링 수정' 클릭 시 처리 로직
-            redirect(`/mypage/open-mentoring/${params.data.id}`);
+            redirect(`/classrooms/${params.data.classroomId}`);
           } else {
-            // '강의실 입장' 클릭 시 처리 로직
-            redirect(`/classroom/${params.data.id}`);
+            redirect(`/classrooms/${params.data.classroomId}`);
           }
         }
       },

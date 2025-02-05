@@ -1,5 +1,7 @@
 import ChatComponent from '@/app/classrooms/_component/ChatComponent';
 import VideoComponent from '@/app/classrooms/_component/VideoComponent';
+import { enterClassroom, startClassroom } from '@/app/classrooms/action';
+import { useAuthStore } from '@/context/AuthContext';
 import { IoChevronBackSharp } from 'react-icons/io5';
 import Image from 'next/image';
 import Link from 'next/link';

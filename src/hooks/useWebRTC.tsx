@@ -19,7 +19,8 @@ import { useState, useContext, useCallback } from 'react';
 const usePeerConnections = (
   classroomId: bigint,
   stream: MediaStream,
-  router: AppRouterInstance
+  router: AppRouterInstance,
+  mentorId?: string
 ) => {
   const publish = useContext(StompPublishContext);
   const subscribe = useContext(StompSubscribeContext);
@@ -176,7 +177,6 @@ const usePeerConnections = (
                 }
               }
             } else {
-              console.log(303);
               return;
             }
           }
@@ -208,8 +208,10 @@ const usePeerConnections = (
 
           localPeerConnection.setRemoteId = remoteId;
 
-          if (remoteId === userId) {
-            moveToMentorContainer(peerId);
+          if (mentorId) {
+            if (remoteId === mentorId) {
+              moveToMentorContainer(peerId);
+            }
           }
 
           await localPeerConnection.receiveAnswerCallback(description);
