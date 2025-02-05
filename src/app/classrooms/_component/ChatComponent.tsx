@@ -106,7 +106,7 @@ export default function ChatComponent({ classroomId, mentorId }: Props) {
                   {chat.userId === mentorId ? (
                     <p className="text-gray-500 my-2">{chat.username} 멘토</p>
                   ) : (
-                    <p className="text-gray-500 my-2 text-end">
+                    <p className="text-gray-500 my-2 text-start">
                       {chat.username}
                     </p>
                   )}
