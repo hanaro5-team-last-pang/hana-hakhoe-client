@@ -60,7 +60,7 @@ export default function ProfileDropdown({ authData, fetchAuth }: Props) {
           <div className="flex items-center justify-center bg-gray-100 rounded-lg p-2">
             <PiShoppingBagOpen />
           </div>
-          <div className="text-xs px-2">새 강의 만들기</div>
+          <div className="text-xs px-2">새로운 멘토링 개설</div>
         </Link>
       )}
       <Link

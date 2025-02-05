@@ -5,5 +5,5 @@ interface Props {
 export default function MentoringDescriptionForm(props: Props) {
   const { lectureDescription } = props;
 
-  return <p className="p-10">{lectureDescription}</p>;
+  return <p className="p-10 whitespace-pre-line">{lectureDescription}</p>;
 }

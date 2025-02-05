@@ -155,7 +155,7 @@ export default function OpenMentoringForm() {
                 ref={maxParticipantsRef}
               >
                 <option value="">선택하세요</option>
-                {[1, 2, 3, 4, 5].map((num) => (
+                {[1, 2, 3, 4].map((num) => (
                   <option key={num} value={num}>
                     {num}
                   </option>
