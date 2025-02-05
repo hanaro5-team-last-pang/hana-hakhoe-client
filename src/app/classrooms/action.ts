@@ -53,8 +53,6 @@ export async function terminateClassroom(classroomId: string): Promise<void> {
     jwt: accessJwtCookie.value,
   });
 
-  console.log(res.ok, res);
-
   if (!res.ok) {
     notFound();
   }

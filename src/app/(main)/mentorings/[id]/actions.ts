@@ -1,6 +1,5 @@
 'use server';
 
-import { LectureType } from '@/app/(main)/mentorings/type';
 import { ActionResType, BaseResType } from '@/types/hanaHakdang';
 import { checkAuthAndGetCookie } from '@/utils/CheckCookies';
 import { fetcher } from '@/utils/fetcher';
@@ -34,9 +33,10 @@ export async function enrollLecture(
   };
 }
 
+//수강 취소
 export async function withdrawLecture(
   enrollmentId: number
-): Promise<ActionResType<LectureType, string>> {
+): Promise<ActionResType<null, string>> {
   const accessJwtCookie = await checkAuthAndGetCookie();
 
   const res = await fetcher(
@@ -51,5 +51,5 @@ export async function withdrawLecture(
     notFound();
   }
   const result = await res.json();
-  return result.result;
+  return result.message;
 }

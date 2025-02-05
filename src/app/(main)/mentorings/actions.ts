@@ -57,24 +57,29 @@ export async function postLectureReviews(
   formData: FormData
 ): Promise<ActionResType<ReviewFormType, string>> {
   const accessJwtCookie = await checkAuthAndGetCookie();
+  console.log(formData);
   const content = formData.get('content') as string;
   const score = Number(formData.get('score'));
-  const lectureId = formData.get('lectureId') as string;
+  const lectureId = Number(formData.get('lectureId'));
+  console.log(lectureId, content, score);
 
   const res = await fetcher('POST', `/lectures/reviews/${lectureId}`, {
     jwt: accessJwtCookie.value,
     body: JSON.stringify({ content: content, score: score }),
   });
+  console.log(res);
   if (!res.ok) {
     notFound();
   }
-  const data = (await res.json()) as BaseResType<ReviewFormType>;
-  redirect(`/mentorings/${lectureId}`);
-  return {
-    value: data.result,
-    message: data.message,
-    isError: false,
-  };
+  const data = await res.json();
+  console.log(data.result);
+  redirect('/mypage/mentorings');
+  // const data = (await res.json()) as BaseResType<ReviewFormType>;
+  // return {
+  //   value: data.result,
+  //   message: data.message,
+  //   isError: false,
+  // };
 }
 
 /**

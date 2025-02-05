@@ -38,6 +38,8 @@ export default function Page() {
                 classroomId: lecture.classroomId,
                 lectureId: lecture.lectureId,
               })),
+            ];
+            const histories = [
               ...result.lectureList.done.map((lecture) => ({
                 title: lecture.title,
                 start_date: lecture.startTime,
@@ -47,6 +49,7 @@ export default function Page() {
               })),
             ];
             setMentorings(mentorings);
+            setHistories(histories);
           } else {
             // 멘티일 경우
             const [result_queue, result_history] = await Promise.all([
@@ -61,6 +64,9 @@ export default function Page() {
               status: '시작 전',
               classroomId: mentoring.classroomId,
               lectureId: mentoring.lectureId,
+              enrollmentId: mentoring.enrollmentId,
+              isEnrollmentCanceled: mentoring.isEnrollmentCanceled,
+              isLectureCanceled: mentoring.isLectureCanceled,
             }));
 
             const historiesData = result_history.enrollmentList.map(
@@ -71,6 +77,9 @@ export default function Page() {
                 status: mentoring.isDone ? '수강 완료' : '취소됨',
                 classroomId: mentoring.classroomId,
                 lectureId: mentoring.lectureId,
+                enrollmentId: mentoring.enrollmentId,
+                isEnrollmentCanceled: mentoring.isEnrollmentCanceled,
+                isLectureCanceled: mentoring.isLectureCanceled,
               })
             );
 
@@ -90,7 +99,7 @@ export default function Page() {
     <div className="w-full">
       <div className="flex justify-between items-center">
         <div className="text-ourGreen m-2 text-2xl font-bold">
-          {auth?.role === 'MENTOR' ? '나의 멘토링 기록' : '멘토링 신청 기록'}
+          {auth?.role === 'MENTOR' ? '내가 만든 멘토링' : '멘토링 신청 기록'}
         </div>
         {auth?.role === 'MENTOR' && (
           <LinkButton
@@ -101,14 +110,14 @@ export default function Page() {
         )}
       </div>
       <div className="flex flex-col justify-center mt-3 mb-10 px-2">
-        <MentoringListTable mentorings={mentorings} />
+        <MentoringListTable mentorings={mentorings} histories={histories} />
         {/* 수강 완료된 히스토리가 있을 경우, 추가로 다른 MentoringListTable 표시 */}
         {histories.length > 0 && (
           <div className="mt-6">
             <div className="text-ourGreen m-2 text-2xl font-bold">
-              수강 완료 내역
+              완료된 멘토링 내역
             </div>
-            <MentoringListTable mentorings={histories} />
+            <MentoringListTable mentorings={histories} histories={histories} />
           </div>
         )}
       </div>
