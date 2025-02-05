@@ -1,10 +1,25 @@
-import { getNewsData } from '@/app/(main)/news/action';
+import { NewsType } from '@/app/(main)/news/type';
 import CardView from '@/components/organisms/CardView';
+import Pagination from '@/components/organisms/Pagination';
+import { BaseResType } from '@/types/hanaHakdang';
+import { fetcher } from '@/utils/fetcher';
 import dayjs from 'dayjs';
 
-export default async function Page() {
-  const newsData = await getNewsData();
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | undefined };
+}) {
+  const page = Number(searchParams.page) || 0;
   const newsUrlDomain = 'https://www.fetimes.co.kr';
+
+  const data = await fetcher('GET', `/news?page=${page}`);
+  const newsRes = (await data.json()) as BaseResType<NewsType>;
+  const totalNews = newsRes.result.totalCount;
+  const newsData = newsRes.result.newsList;
+
+  //페이지네이션 컴포넌트로 전달될 데이터 개수
+  const itemsPerPage = 6;
 
   return (
     <>
@@ -14,7 +29,6 @@ export default async function Page() {
             <div className="flex flex-row justify-between mb-6 w-full">
               <h1 className="text-2xl font-bold">최근 금융 동향</h1>
             </div>
-            {/* 뉴스 데이터가 없을 경우 메시지 표시 */}
             {newsData.length === 0 ? (
               <p className="text-center text-gray-500">
                 저장된 뉴스가 없습니다.
@@ -35,6 +49,17 @@ export default async function Page() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* 페이지네이션 컴포넌트 */}
+      <div className="my-10 mb-20">
+        <Pagination
+          currentPage={page}
+          totalItems={totalNews}
+          itemsPerPage={itemsPerPage}
+          buttonColor="bg-ourOrange"
+          subUrl="/news"
+        />
       </div>
     </>
   );

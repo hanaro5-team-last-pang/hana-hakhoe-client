@@ -6,6 +6,7 @@ import {
 import CheckboxList from '@/components/molecules/CheckboxList';
 import CardView from '@/components/organisms/CardView';
 import MentoringList from '@/components/organisms/MentoringList';
+import Pagination from '@/components/organisms/Pagination';
 import SearchBar from '@/components/template/SearchBar';
 import { BADGE_COLORS } from '@/constant';
 import { BaseResType } from '@/types/hanaHakdang';
@@ -66,18 +67,22 @@ export default async function Page(props: { searchParams: SearchParams }) {
   const categoryResult =
     (await responses[1].json()) as BaseResType<CategoryList>;
 
+  //page component
+  const totalItems = searchResult.result.totalCount;
+  const itemsPerPage = 6;
+
   return (
     <>
       <div className="wrapper flex w-full my-10 gap-10 items-start">
         <div className="w-5/6">
           <div className="flex flex-col w-full">
             <div className="flex flex-row justify-between mb-6 w-full">
-              <h1 className="text-2xl font-bold">전체 멘토링 강의</h1>
+              <h1 className="text-2xl font-bold">전체 멘토링 목록</h1>
               <SearchBar />
             </div>
             {cardData.length === 0 ? (
               <div className="mt-4 flex justify-center">
-                <p>멘토링 강의를 찾을 수 없습니다.</p>
+                <p>멘토링 정보를 찾을 수 없습니다.</p>
               </div>
             ) : (
               <div className="grid grid-rows-6 gap-6 gap-y-8 mt-4">
@@ -123,6 +128,15 @@ export default async function Page(props: { searchParams: SearchParams }) {
             </div>
           </div>
         </div>
+      </div>
+      <div className="my-10 mb-20">
+        <Pagination
+          currentPage={page}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          buttonColor="bg-ourOrange"
+          subUrl={subUrl}
+        />
       </div>
     </>
   );

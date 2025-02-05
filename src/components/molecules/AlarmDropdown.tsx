@@ -29,11 +29,11 @@ export default function AlarmDropdown({
           <div className="drop-shadow text-xs mb-2">멘토링 5분 전입니다.</div>
           <div className="flex text-xs">
             <PiChalkboardTeacherDuotone size="24" />
-            <div className="mt-1">강의명 : {lectureTitle}</div>
+            <div className="mt-1">멘토링 : {lectureTitle}</div>
           </div>
           <div className="flex text-xs">
             <CiCalendarDate size="24" />
-            <div className="mt-1">강의시간 : {lectureTime}</div>
+            <div className="mt-1">멘토링 시간 : {lectureTime}</div>
           </div>
         </button>
       </div>
@@ -47,11 +47,11 @@ export default function AlarmDropdown({
           }}
         >
           <div className="drop-shadow text-xs mb-2">
-            멘토가 강의 내용을 변경하였습니다.
+            멘토가 멘토링 내용을 변경하였습니다.
           </div>
           <div className="flex text-xs">
             <PiChalkboardTeacherDuotone size="24" />
-            <div className="mt-1">강의명 : {lectureTitle}</div>
+            <div className="mt-1">멘토링 : {lectureTitle}</div>
           </div>
         </button>
       </div>
