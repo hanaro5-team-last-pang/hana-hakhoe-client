@@ -68,8 +68,9 @@ export default function CardView({
           </div>
         </div>
         <div className="flex-1 p-4">
-          <div className="text-xl font-bold mb-1">{title}</div>
-
+          <div className="truncate-two-lines text-xl font-bold mb-1">
+            {title}
+          </div>
           {mentor_name && (
             <div className="text-gray-700 mb-2">{mentor_name} 멘토</div>
           )}

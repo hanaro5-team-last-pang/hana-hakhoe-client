@@ -39,16 +39,16 @@ export const MentoringMenuTab: StoryObj<typeof TabBody> = {
   args: {
     tabList: [
       {
-        tabTitle: '강의 설명',
-        tabOnClickEvent: () => console.log('강의 설명 탭 클릭됨'),
+        tabTitle: '멘토링 설명',
+        tabOnClickEvent: () => console.log('멘토링 설명 탭 클릭됨'),
       },
       {
         tabTitle: '멘토 소개',
         tabOnClickEvent: () => console.log('멘토 소개 탭 클릭됨'),
       },
       {
-        tabTitle: '강의 리뷰',
-        tabOnClickEvent: () => console.log('강의 리뷰 탭 클릭됨'),
+        tabTitle: '멘토링 리뷰',
+        tabOnClickEvent: () => console.log('멘토링 리뷰 탭 클릭됨'),
       },
       {
         tabTitle: 'FAQs',
@@ -56,9 +56,9 @@ export const MentoringMenuTab: StoryObj<typeof TabBody> = {
       },
     ],
     tabPanelList: [
-      <div>강의에 대한 상세한 설명이 여기에 들어갑니다.</div>,
+      <div>멘토링에 대한 상세한 설명이 여기에 들어갑니다.</div>,
       <div>멘토 소개 내용이 여기에 들어갑니다.</div>,
-      <div>강의 리뷰가 여기에 들어갑니다.</div>,
+      <div>멘토링 리뷰가 여기에 들어갑니다.</div>,
       <div>자주 묻는 질문이 여기에 들어갑니다.</div>,
     ],
     activeText: 'text-ourOrange font-bold',

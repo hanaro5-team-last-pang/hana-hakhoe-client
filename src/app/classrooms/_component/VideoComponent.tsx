@@ -126,7 +126,7 @@ export default function VideoComponent({ classroomId, mentorKey }: Props) {
                       />
                       <Button
                         type="submit"
-                        text="강의 종료"
+                        text="멘토링 종료"
                         className="rounded-full bg-red-500 text-white text-sm font-medium px-4 py-2 shadow-md"
                         onClick={() => closeClassroom(auth!.userId)}
                       />

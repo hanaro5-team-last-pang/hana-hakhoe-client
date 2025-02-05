@@ -24,7 +24,7 @@ export default async function Page(props: { params: Params }) {
   const tabList = [
     { tabTitle: '멘토링 소개' },
     { tabTitle: '멘토 소개' },
-    { tabTitle: '강의 리뷰' },
+    { tabTitle: '멘토링 리뷰' },
     { tabTitle: 'FAQs' },
   ];
 

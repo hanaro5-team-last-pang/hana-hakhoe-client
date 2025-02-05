@@ -17,7 +17,7 @@ export default function Error({ error }: ErrorProps) {
   return (
     <BaseErrorWrapper>
       <div className="flex flex-col items-center space-y-3 mt-3">
-        <p className="text-xl">강의실에 입장할 수 없습니다.</p>
+        <p className="text-xl">멘토링에 입장할 수 없습니다.</p>
         <Link
           href="/mentorings"
           className="bg-ourOrange text-white rounded-full py-2 px-4 mr-3 mb-1 hover:bg-orange-600 transition"

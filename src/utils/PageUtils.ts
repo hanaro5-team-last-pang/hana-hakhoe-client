@@ -2,7 +2,7 @@ export class PageUtils {
   static findCurrentLocation(location: string) {
     switch (location) {
       case '/mentorings':
-        return '홈 > 전체 멘토링 강의';
+        return '홈 > 전체 멘토링 목록';
       case '/news':
         return '홈 > 금융 뉴스';
       case '/mypage':
