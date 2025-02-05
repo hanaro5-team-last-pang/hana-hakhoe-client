@@ -21,6 +21,7 @@ const usePeerConnections = (
   classroomId: string,
   stream: MediaStream,
   router: AppRouterInstance,
+  lectureId: number,
   mentorId?: string
 ) => {
   const publish = useContext(StompPublishContext);
@@ -134,7 +135,7 @@ const usePeerConnections = (
             remote?.close();
           });
           pcListMap.clear();
-          router.replace(`/classrooms/${classroomId}/review`);
+          router.replace(`/classrooms/${lectureId}/review`);
         }
       });
 

@@ -37,6 +37,7 @@ export default async function Page(props: { params: Params }) {
       : await startClassroom(classroomId);
 
   const lectureName = classroomInfo.lectureTitle;
+  const lectureId = classroomInfo.lectureId;
 
   const mentorId =
     role === 'MENTEE'
@@ -67,7 +68,11 @@ export default async function Page(props: { params: Params }) {
           </Link>
           <div className="font-bold ">{lectureName}</div>
         </div>
-        <VideoComponent classroomId={classroomId} mentorId={mentorId} />
+        <VideoComponent
+          classroomId={classroomId}
+          mentorId={mentorId}
+          lectureId={lectureId}
+        />
       </div>
       <div className="p-4 relative overflow-y-auto">
         <ChatComponent classroomId={classroomId} mentorId={mentorId} />

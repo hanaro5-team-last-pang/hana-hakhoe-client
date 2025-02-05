@@ -16,10 +16,15 @@ import React, { useEffect, useContext, useRef } from 'react';
 
 interface Props {
   classroomId: string;
+  lectureId: number;
   mentorId?: string;
 }
 
-export default function VideoComponent({ classroomId, mentorId }: Props) {
+export default function VideoComponent({
+  classroomId,
+  lectureId,
+  mentorId,
+}: Props) {
   const router = useRouter();
   const { auth, loading } = useAuthStore((state) => state);
   const { videoRef, changeDevice, stream } = useLocalVideo();
@@ -27,7 +32,7 @@ export default function VideoComponent({ classroomId, mentorId }: Props) {
   const isConnected = useContext(StompIsConnectedContext);
   const publish = useContext(StompPublishContext);
   const { subscribeEnter, closeClassroom, startScreenStream } =
-    usePeerConnections(classroomId, stream!, router, mentorId);
+    usePeerConnections(classroomId, stream!, router, lectureId, mentorId);
 
   const executedRef = useRef(false);
 
