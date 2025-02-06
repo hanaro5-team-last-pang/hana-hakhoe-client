@@ -90,7 +90,7 @@ body {
   min-height: 100vh;
   color: var(--foreground);
   background: var(--background);
-  font-family: 'FontLight'
+  font-family: 'FontLight';
 }
 
 .custom-toast {

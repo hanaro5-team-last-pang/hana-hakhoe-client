@@ -8,9 +8,10 @@ import dayjs from 'dayjs';
 export default async function Page({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | undefined };
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const page = Number(searchParams.page) || 0;
+  const paramsPage = await searchParams;
+  const page = Number(paramsPage.page).valueOf() || 0;
   const newsUrlDomain = 'https://www.fetimes.co.kr';
 
   const data = await fetcher('GET', `/news?page=${page}`);

@@ -27,15 +27,14 @@ export default function FAQList({ faqs }: FAQListProps) {
   return (
     <div>
       {currentFAQs.map((faqComments, index) => {
-        const { userName, content, profileImageUrl, createdAt, answers } =
-          faqComments;
+        const { userName, content, ImageUrl, createdAt, answers } = faqComments;
 
         return (
           <div key={index} className="mb-4">
             <div className="my-2 border-t border-gray-300" />
             <div className="flex items-center justify-between">
               <Comment
-                profileImageUrl={profileImageUrl}
+                profileImageUrl={ImageUrl}
                 userName={userName}
                 content={content}
                 createdAt={createdAt}
