@@ -1,19 +1,23 @@
 'use client';
 
 import { verifyEmail } from '@/app/(auth)/action';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function Page() {
-  const searchParams = useSearchParams();
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ email?: string; authToken?: string }>;
+}) {
+  const params = await searchParams;
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [isError, setIsError] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number | null>(null);
 
-  const email = searchParams.get('email');
-  const authToken = searchParams.get('authToken');
+  const email = params.email;
+  const authToken = params.authToken;
 
   useEffect(() => {
     if (email && authToken) {
